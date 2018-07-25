@@ -1,5 +1,3 @@
-#include "background.h"
-
 Background *newBackground(World *w, int layer, gfx_t *data, BgType type, BgSize size, int mapBase, int tileBase, Screen screen){
     Background *b = malloc(sizeof(Background));
     b->id = screen == MAIN_SCREEN ? bgInit(layer, type, size, mapBase, tileBase) : bgInitSub(layer, type, size, mapBase, tileBase);

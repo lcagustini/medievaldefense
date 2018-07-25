@@ -1,6 +1,8 @@
 #ifndef TYPES
 #define TYPES
 
+#include <stdio.h>
+
 #define WORLD_SIZE_TILES 32
 #define GRID_UNIT_SIZE 16
 #define WORLD_SIZE WORLD_SIZE_TILES*GRID_UNIT_SIZE
@@ -15,6 +17,8 @@
 #define MAP_LEN(a) a##MapLen
 #define CREATE_OBJECT_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a)};
 #define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a), MAP(a), MAP_LEN(a)};
+
+enum Directions{DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT};
 
 typedef struct
 {
@@ -39,6 +43,7 @@ typedef struct{
     SpriteColorFormat color;
     gfx_t *gfxData;
     u8 priority;
+    u8 palId;
 } Object;
 
 typedef struct{
@@ -48,10 +53,10 @@ typedef struct{
 } Background;
 
 typedef struct{
-    Object *objects[20];
+    Object objects[100];
     Background *bgs[4];
     u8 objectNumber;
-    u8 grid[WORLD_SIZE_TILES][WORLD_SIZE_TILES];
+    s16 grid[16][12];
     int camera_x;
     int camera_y;
 } World;
