@@ -6,6 +6,7 @@
 
 #include <teste.h>
 #include <tower.h>
+#include <troll.h>
 
 void setUpScreens(){
     videoSetMode(MODE_0_2D);
@@ -36,15 +37,19 @@ int main(void){
     setUpScreens();
 
     World w = {0};
-    memset(&w.grid, -1, 2*16*12);
+    memset(&w.grid, -1, 2*16*24);
 
     CREATE_BG_GFX(teste);
     newBackground(&w, 1, &teste, BgType_Text4bpp, BgSize_T_512x512, 1, 1, MAIN_SCREEN);
     newBackground(&w, 2, &teste, BgType_Text4bpp, BgSize_T_512x512, 1, 1, SUB_SCREEN);
 
     CREATE_OBJECT_GFX(tower);
+    CREATE_OBJECT_GFX(troll);
+    u8 troll_id = newObject(&w, 32, 48, 0, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
+
+    
 
     touchPosition t;
     u16 dt;
@@ -58,7 +63,7 @@ int main(void){
                 u8 x = (t.px >> 4) << 4;
                 u8 y = (t.py >> 4) << 4;
 
-                if(w.grid[x >> 4][y >> 4] == -1)
+                if(w.grid[x >> 4][(y >> 4) + 12] == -1)
                     newObject(&w, x, y, 0, &oamSub, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
             }
             pressed = TRUE;
@@ -66,6 +71,8 @@ int main(void){
         else {
             pressed = FALSE;
         }
+
+
 
         //fprintf(stderr, "x: %d, y: %d, rx: %d, ry: %d, z1: %d, z2: %d\n", t.px, t.py, t.rawx, t.rawy, t.z1, t.z2);
 

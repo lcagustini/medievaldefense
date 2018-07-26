@@ -44,6 +44,8 @@ typedef struct{
     gfx_t *gfxData;
     u8 priority;
     u8 palId;
+    u8 path[400][2];
+    u16 cur_path_index;
 } Object;
 
 typedef struct{
@@ -56,7 +58,7 @@ typedef struct{
     Object objects[100];
     Background *bgs[4];
     u8 objectNumber;
-    s16 grid[16][12];
+    s16 grid[16][24];
     int camera_x;
     int camera_y;
 } World;
