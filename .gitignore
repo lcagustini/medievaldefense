@@ -54,3 +54,6 @@ dkms.conf
 # Vim
 *~
 *.swp
+
+# Build
+build/*

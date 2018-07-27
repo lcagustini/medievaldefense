@@ -67,7 +67,7 @@ typedef struct{
 
 typedef struct{
     Object objects[100];
-    Background *bgs[4];
+    Background bgs[4];
     u8 objectNumber;
     s16 grid[16][24];
     int camera_x;

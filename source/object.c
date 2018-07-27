@@ -75,11 +75,13 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
         w->grid[s.x >> 4][(s.y >> 4) + 12] = s.id; 
     }
 
+    /*
     if (s.speed) {
         s.path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
         dijkstra(&s);
         // TODO: remember to free on obj destruction
     }
+    */
 
     return s.id;
 }
@@ -194,5 +196,4 @@ void dijkstra(Object *obj) {
     free(queue.data);
     free(visited);
 }
-
 
