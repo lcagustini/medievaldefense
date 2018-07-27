@@ -8,6 +8,8 @@
 #include <tower.h>
 #include <troll.h>
 
+#define PRINT(...) fprintf(stderr, __VA_ARGS__)
+
 void setUpScreens(){
     videoSetMode(MODE_0_2D);
     videoSetModeSub(MODE_0_2D);
@@ -53,7 +55,7 @@ int main(void){
 
     touchPosition t;
     u16 dt;
-    u8 pressed;
+    u8 pressed = FALSE;
     while(1){
         scanKeys();
         touchRead(&t);

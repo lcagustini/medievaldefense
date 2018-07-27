@@ -20,6 +20,17 @@
 
 enum Directions{DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT};
 
+typedef struct {
+    u16 id;
+    u16 value;
+} bin_heap_elem_t;
+
+typedef struct {
+    u16 max_size;
+    u16 size;
+    bin_heap_elem_t *data;
+} bin_heap_t;
+
 typedef struct
 {
     const uint *tiles;
@@ -44,7 +55,7 @@ typedef struct{
     gfx_t *gfxData;
     u8 priority;
     u8 palId;
-    u8 path[400][2];
+    u16 *path;
     u16 cur_path_index;
 } Object;
 

@@ -1,3 +1,13 @@
+#define GRIDX(x) ((x) >> 4)
+#define GRIDY(y) ((y) >> 4)
+#define GRID_POS(x, y) (y + ((x) >> 4))
+#define GRID_XPOS(coord) ((coord) % 16)
+#define GRID_YPOS(coord) ((coord) >> 4)
+
+#define MAX_PATH_BIN_HEAP_SIZE 400
+
+void dijkstra(Object *obj);
+
 void updateObject(Object s){
     bool hflip = false;
     if(s.direction == DIR_RIGHT){
@@ -66,35 +76,18 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
     }
 
     if (s.speed) {
+        s.path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
         dijkstra(&s);
+        // TODO: remember to free on obj destruction
     }
 
     return s.id;
 }
 
-#define GRIDX(x) (x >> 4)
-#define GRIDY(y) (y >> 4)
-#define GRID_POS(x, y) (y + (x >> 4))
-#define GRID_XPOS(coord) (coord % 16)
-#define GRID_YPOS(coord) (coord >> 4)
-
-#define MAX_BIN_HEAP_SIZE 400
-
-typedef struct {
-    u16 max_size;
-    u16 size;
-    u16 data[MAX_BIN_HEAP_SIZE];
-} bin_heap_t;
-
-typedef struct {
-    u16 id;
-    u16 value;
-} bin_heap_elem_t;
-
 void initialize_priority_queue(bin_heap_t *h) {
-    h->max_size = MAX_BIN_HEAP_SIZE;
+    h->max_size = MAX_PATH_BIN_HEAP_SIZE;
     h->size = 0;
-    memset(h->data, 0, MAX_BIN_HEAP_SIZE * 2);
+    memset(h->data, 0, MAX_PATH_BIN_HEAP_SIZE * 2);
 }
 
 void insert_priority_queue(bin_heap_t *h, bin_heap_elem_t elem) {
@@ -122,13 +115,13 @@ bin_heap_elem_t pop_priority_queue(bin_heap_t *h) {
 
     int p = 0;
     while (p <= h->size) {
-        u16 left = h->data[p * 2 + 1];
-        u16 right = h->data[p * 2 + 2];
+        bin_heap_elem_t left = h->data[p * 2 + 1];
+        bin_heap_elem_t right = h->data[p * 2 + 2];
 
         s8 swap = 0;
-        if (p < left && p * 2 + 1 < h->size) {
+        if (p < left.value && p * 2 + 1 < h->size) {
             swap = -1;
-        } else if (p > right && p * 2 + 2 < h->size) {
+        } else if (p > right.value && p * 2 + 2 < h->size) {
             swap = 1;
         }
 
@@ -153,6 +146,7 @@ bin_heap_elem_t pop_priority_queue(bin_heap_t *h) {
 void dijkstra(Object *obj) {
 
     bin_heap_t queue;
+    queue.data = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(*queue.data));
     initialize_priority_queue(&queue);
 
     u16 starting_pos = GRID_POS(obj->x, obj->y);
@@ -160,10 +154,10 @@ void dijkstra(Object *obj) {
     bin_heap_elem_t start = {starting_pos, 0};
     insert_priority_queue(&queue, start);
 
-    u16 visited[400] = {0};
+    u16 *visited = calloc(MAX_PATH_BIN_HEAP_SIZE, sizeof(u16));
     visited[starting_pos] = 1;
 
-    while (queue->size) {
+    while (queue.size) {
         bin_heap_elem_t next_pos = pop_priority_queue(&queue);
 
         u16 x = GRIDX(next_pos.id);
@@ -190,8 +184,15 @@ void dijkstra(Object *obj) {
             visited[GRID_POS(x, y - 1)] = 1;
         }
 
+        //fprintf(stderr, "queue: [");
+        //fprintf(stderr, "");
+        PRINT("ABC\n");
+
         // TODO: stop and reconstruct path when desired Y is reached
     }
+
+    free(queue.data);
+    free(visited);
 }
 
 
