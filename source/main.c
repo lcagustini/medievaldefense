@@ -47,7 +47,7 @@ int main(void){
 
     CREATE_OBJECT_GFX(tower);
     CREATE_OBJECT_GFX(troll);
-    u8 troll_id = newObject(&w, 32, 48, 0, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+    u8 troll_id = newObject(&w, 32, 48, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
@@ -65,8 +65,12 @@ int main(void){
                 u8 x = (t.px >> 4) << 4;
                 u8 y = (t.py >> 4) << 4;
 
-                if(w.grid[x >> 4][(y >> 4) + 12] == -1)
+                if(w.grid[x >> 4][(y >> 4) + 12] == -1) {
                     newObject(&w, x, y, 0, &oamSub, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
+
+                    // TODO: do this for every moving object
+                    dijkstra(&w, troll_id);
+                }
             }
             pressed = TRUE;
         }
@@ -75,8 +79,7 @@ int main(void){
         }
 
 
-
-        //fprintf(stderr, "x: %d, y: %d, rx: %d, ry: %d, z1: %d, z2: %d\n", t.px, t.py, t.rawx, t.rawy, t.z1, t.z2);
+        //PRINT("x: %d, y: %d, rx: %d, ry: %d, z1: %d, z2: %d\n", t.px, t.py, t.rawx, t.rawy, t.z1, t.z2);
 
         Pressed = keysDown();
         Held = keysHeld();

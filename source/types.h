@@ -57,6 +57,7 @@ typedef struct{
     u8 palId;
     u16 *path;
     u16 cur_path_index;
+    u16 path_size;
 } Object;
 
 typedef struct{
