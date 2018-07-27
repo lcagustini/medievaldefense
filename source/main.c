@@ -40,8 +40,8 @@ int main(void){
     memset(&w.grid, -1, 2*16*24);
 
     CREATE_BG_GFX(teste);
-    newBackground(&w, 1, &teste, BgType_Text4bpp, BgSize_T_512x512, 1, 1, MAIN_SCREEN);
-    newBackground(&w, 2, &teste, BgType_Text4bpp, BgSize_T_512x512, 1, 1, SUB_SCREEN);
+    newBackground(&w, 1, &teste, BgType_Text4bpp, BgSize_T_256x256, 1, 1, MAIN_SCREEN);
+    newBackground(&w, 2, &teste, BgType_Text4bpp, BgSize_T_256x256, 1, 1, SUB_SCREEN);
 
     CREATE_OBJECT_GFX(tower);
     CREATE_OBJECT_GFX(troll);

@@ -65,13 +65,16 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
         w->grid[s.x >> 4][(s.y >> 4) + 12] = s.id; 
     }
 
+    /*
     if (s.speed) {
         dijkstra(&s);
     }
+    */
 
     return s.id;
 }
 
+#if 0
 #define GRIDX(x) (x >> 4)
 #define GRIDY(y) (y >> 4)
 #define GRID_POS(x, y) (y + (x >> 4))
@@ -194,4 +197,5 @@ void dijkstra(Object *obj) {
     }
 }
 
+#endif
 
