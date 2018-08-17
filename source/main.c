@@ -68,8 +68,14 @@ int main(void){
                 if(w.grid[x >> 4][(y >> 4) + 12] == -1) {
                     newObject(&w, x, y, 0, &oamSub, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
 
-                    // TODO: do this for every moving object
-                    dijkstra(&w, troll_id);
+                    for (int i = 0; i < w.objectNumber; i++) {
+                        if (w.objects[i].speed) {
+                            dijkstra(&w, w.objects[i].id);
+                        }
+                    }
+                }
+                else {
+                    PRINT(" xxxxx");
                 }
             }
             pressed = TRUE;
@@ -78,6 +84,40 @@ int main(void){
             pressed = FALSE;
         }
 
+        for (int i = 0; i < w.objectNumber; i++) {
+            Object *cur = &w.objects[i];
+
+            if (cur->speed) {
+                u8 x0 = GRID_XPOS(cur->path[cur->cur_path_index]);
+                u8 y0 = GRID_YPOS(cur->path[cur->cur_path_index]);
+
+                u8 x = GRID_XPOS(cur->path[cur->cur_path_index +1]);
+                u8 y = GRID_YPOS(cur->path[cur->cur_path_index +1]);
+
+                s8 dx = x - x0;
+                s8 dy = y - y0;
+
+                if (dx) {
+                    sassert(dx == -1 || dx == 1, "Invalid path");
+                    cur->x += dx;
+                }
+                if (dy) {
+                    sassert(dy == -1 || dy == 1, "Invalid path");
+                    cur->y += dy;
+                }
+
+                if (cur->y % 16 == 0 && cur->x % 16 == 0) {
+                    w.grid[x0][y0] = -1;
+                    w.grid[x][y] = cur->id; 
+
+                    cur->cur_path_index++;
+
+                    if (cur->cur_path_index == cur->path_size - 1) {
+                        cur->speed = 0; // TODO: Hacky object stop
+                    }
+                }
+            }
+        }
 
         //PRINT("x: %d, y: %d, rx: %d, ry: %d, z1: %d, z2: %d\n", t.px, t.py, t.rawx, t.rawy, t.z1, t.z2);
 

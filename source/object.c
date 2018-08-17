@@ -148,17 +148,17 @@ bin_heap_elem_t pop_priority_queue(bin_heap_t *h) {
 }
 
 void dijkstra(World *world, u16 id) {
-    Object obj = world->objects[id];
+    Object *obj = &world->objects[id];
 
     bin_heap_t queue;
     queue.data = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(*queue.data));
     initialize_priority_queue(&queue);
 
     u16 starting_pos;
-    if (obj.screen == &oamMain) {
-        starting_pos = GRID_POS(obj.x >> 4, obj.y >> 4);
+    if (obj->screen == &oamMain) {
+        starting_pos = GRID_POS(obj->x >> 4, obj->y >> 4);
     } else {
-        starting_pos = GRID_POS(obj.x >> 4, (obj.y >> 4) + 12);
+        starting_pos = GRID_POS(obj->x >> 4, (obj->y >> 4) + 12);
     }
 
     bin_heap_elem_t start = {starting_pos, 0};
@@ -285,31 +285,31 @@ void dijkstra(World *world, u16 id) {
 #endif
     }
 
-    obj.cur_path_index = 0;
+    obj->cur_path_index = 0;
 
     u16 pos = end;
     {
         u16 i = 0;
         while (pos != starting_pos) {
-            obj.path[i++] = pos;
+            obj->path[i++] = pos;
             pos = predecessor[pos];
         }
-        obj.path_size = i;
+        obj->path_size = i;
     }
 
     // reverse
     {
-        for (u16 i = 0; i < obj.path_size / 2; i++) {
-            u16 aux = obj.path[i];
-            obj.path[i] = obj.path[obj.path_size - i - 1];
-            obj.path[obj.path_size - i - 1] = aux;
+        for (u16 i = 0; i < obj->path_size / 2; i++) {
+            u16 aux = obj->path[i];
+            obj->path[i] = obj->path[obj->path_size - i - 1];
+            obj->path[obj->path_size - i - 1] = aux;
         }
     }
 
 #if 1
     PRINT("path: [");
-    for (int i = 0; i < obj.path_size; i++) {
-        PRINT("%d ", obj.path[i]);
+    for (int i = 0; i < obj->path_size; i++) {
+        PRINT("%d ", obj->path[i]);
     }
     PRINT("]\n");
 #endif

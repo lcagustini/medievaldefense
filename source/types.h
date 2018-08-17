@@ -55,6 +55,7 @@ typedef struct{
     gfx_t *gfxData;
     u8 priority;
     u8 palId;
+
     u16 *path;
     u16 cur_path_index;
     u16 path_size;
