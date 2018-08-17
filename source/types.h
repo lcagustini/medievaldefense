@@ -42,7 +42,7 @@ typedef struct
 } gfx_t;
 
 typedef struct{
-    u8 id;
+    u8 drawId;
     u16 x, y;
     u16* gfx;
     u8 walking;
@@ -71,6 +71,7 @@ typedef struct{
     Object objects[100];
     Background bgs[4];
     u8 objectNumber;
+    u8 lastId;
     s16 grid[16][24];
     int camera_x;
     int camera_y;

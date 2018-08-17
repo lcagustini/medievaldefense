@@ -17,7 +17,7 @@ void updateObject(Object s){
     }
 
     oamSet(s.screen, // which display
-            s.id, // the oam entry to set
+            s.drawId, // the oam entry to set
             s.x, s.y, // x & y location
             1, // priority
             s.palId, // palette for 16 color sprite or alpha for bmp sprite
@@ -49,11 +49,36 @@ void updateScreens(World *w){
     }
 }
 
+void deleteObject(World *w, u8 id) {
+    Object o = w->objects[id];
+
+    oamFreeGfx(o.screen, o.gfx);
+    if (o.path) {
+        free(o.path);
+    }
+
+    w->objectNumber--;
+    for (int i = id; i < w->objectNumber; i++) {
+        w->objects[i] = w->objects[i+1];
+    }
+
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 24; j++) {
+            if (w->grid[i][j] == id) {
+                w->grid[i][j] = -1;
+            }
+            else if (w->grid[i][j] > id) {
+                w->grid[i][j]--;
+            }
+        }
+    }
+}
+
 u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
     sassert(w->objectNumber < SPRITE_COUNT, "Too many sprites!");
 
     Object s;
-    s.id = w->objectNumber;
+    s.drawId = w->lastId;
     s.x = x;
     s.y = y;
     s.gfx = oamAllocateGfx(screen, size, format);
@@ -68,23 +93,26 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
     s.gfxData = data;
     s.palId = palId;
 
-    w->objectNumber++;
-    w->objects[s.id] = s;
+    w->lastId++;
+
+    w->objects[w->objectNumber] = s;
+
     if (screen == &oamMain) {
-        w->grid[s.x >> 4][s.y >> 4] = s.id; 
+        w->grid[s.x >> 4][s.y >> 4] = w->objectNumber; 
         PRINT("s.x %d s.y %d\n", (s.x >> 4), (s.y >> 4));
     } else {
-        w->grid[s.x >> 4][(s.y >> 4) + 12] = s.id; 
+        w->grid[s.x >> 4][(s.y >> 4) + 12] = w->objectNumber; 
         PRINT("s.x %d s.y %d\n", (s.x >> 4), (s.y >> 4) + 12);
     }
 
     if (s.speed) {
         s.path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
-        dijkstra(w, s.id);
-        // TODO: remember to free on obj destruction
+        dijkstra(w, w->objectNumber);
     }
 
-    return s.id;
+    w->objectNumber++;
+
+    return w->objectNumber-1;
 }
 
 u8 switchObjectScreen(World *w, u8 obj) {
@@ -164,6 +192,7 @@ void dijkstra(World *world, u16 id) {
     if (obj->screen == &oamMain) {
         starting_pos = GRID_POS(obj->x >> 4, obj->y >> 4);
     } else {
+        PRINT("%d %d %d %d\n", obj->y, obj->y >> 4, (obj->y >> 4)+12, ((obj->y >> 4) +12 ) << 4);
         starting_pos = GRID_POS(obj->x >> 4, (obj->y >> 4) + 12);
     }
 

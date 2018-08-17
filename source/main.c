@@ -47,11 +47,9 @@ int main(void){
 
     CREATE_OBJECT_GFX(tower);
     CREATE_OBJECT_GFX(troll);
-    u8 troll_id = newObject(&w, 32, 48, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+    u8 troll_id = newObject(&w, 0, 0, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
-
-
 
     touchPosition t;
     u16 dt;
@@ -70,7 +68,7 @@ int main(void){
 
                     for (int i = 0; i < w.objectNumber; i++) {
                         if (w.objects[i].speed) {
-                            dijkstra(&w, w.objects[i].id);
+                            dijkstra(&w, i);
                         }
                     }
                 }
@@ -105,12 +103,13 @@ int main(void){
 
                 if (cur->y % 16 == 0 && cur->x % 16 == 0) {
                     if (dy == 1 && y == 12) {
-                        switchObjectScreen(&w, cur->id);
-                        cur->speed = 0;
+                        u8 newId = switchObjectScreen(&w, i);
+                        PRINT("y: %d\n", w.objects[newId].y);
+                        deleteObject(&w, i);
                     }
 
                     w.grid[x0][y0] = -1;
-                    w.grid[x][y] = cur->id;
+                    w.grid[x][y] = i;
 
                     cur->cur_path_index++;
 
