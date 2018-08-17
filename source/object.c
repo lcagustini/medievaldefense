@@ -87,6 +87,12 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
     return s.id;
 }
 
+u8 switchObjectScreen(World *w, u8 obj) {
+    Object *o = &w->objects[obj];
+
+    return newObject(w, o->x, o->y - 192, o->speed, o->screen == &oamMain ? &oamSub : &oamMain, o->size, o->color, o->gfxData, o->palId);
+}
+
 void initialize_priority_queue(bin_heap_t *h) {
     h->max_size = MAX_PATH_BIN_HEAP_SIZE;
     h->size = 0;

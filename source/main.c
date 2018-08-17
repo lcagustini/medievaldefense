@@ -51,7 +51,7 @@ int main(void){
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
-    
+
 
     touchPosition t;
     u16 dt;
@@ -73,9 +73,6 @@ int main(void){
                             dijkstra(&w, w.objects[i].id);
                         }
                     }
-                }
-                else {
-                    PRINT(" xxxxx");
                 }
             }
             pressed = TRUE;
@@ -107,8 +104,13 @@ int main(void){
                 }
 
                 if (cur->y % 16 == 0 && cur->x % 16 == 0) {
+                    if (dy == 1 && y == 12) {
+                        switchObjectScreen(&w, cur->id);
+                        cur->speed = 0;
+                    }
+
                     w.grid[x0][y0] = -1;
-                    w.grid[x][y] = cur->id; 
+                    w.grid[x][y] = cur->id;
 
                     cur->cur_path_index++;
 
