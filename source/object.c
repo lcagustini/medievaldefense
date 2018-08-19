@@ -99,10 +99,8 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
 
     if (screen == &oamMain) {
         w->grid[s.x >> 4][s.y >> 4] = w->objectNumber; 
-        PRINT("s.x %d s.y %d\n", (s.x >> 4), (s.y >> 4));
     } else {
         w->grid[s.x >> 4][(s.y >> 4) + 12] = w->objectNumber; 
-        PRINT("s.x %d s.y %d\n", (s.x >> 4), (s.y >> 4) + 12);
     }
 
     if (s.speed) {
@@ -116,9 +114,11 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
 }
 
 u8 switchObjectScreen(World *w, u8 obj) {
-    Object *o = &w->objects[obj];
+    Object o = w->objects[obj];
 
-    return newObject(w, o->x, o->y - 192, o->speed, o->screen == &oamMain ? &oamSub : &oamMain, o->size, o->color, o->gfxData, o->palId);
+    deleteObject(w, obj);
+
+    return newObject(w, o.x, 0, o.speed, o.screen == &oamMain ? &oamSub : &oamMain, o.size, o.color, o.gfxData, o.palId);
 }
 
 void initialize_priority_queue(bin_heap_t *h) {
@@ -128,7 +128,6 @@ void initialize_priority_queue(bin_heap_t *h) {
 }
 
 void insert_priority_queue(bin_heap_t *h, bin_heap_elem_t elem) {
-    //PRINT("h->size %d\n h->max_size %d\n", h->size, h->max_size);
     sassert(h->size < h->max_size, "Priority queue overflow.\n");
 
     h->data[h->size++] = elem;
@@ -188,13 +187,7 @@ void dijkstra(World *world, u16 id) {
     queue.data = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(*queue.data));
     initialize_priority_queue(&queue);
 
-    u16 starting_pos;
-    if (obj->screen == &oamMain) {
-        starting_pos = GRID_POS(obj->x >> 4, obj->y >> 4);
-    } else {
-        PRINT("%d %d %d %d\n", obj->y, obj->y >> 4, (obj->y >> 4)+12, ((obj->y >> 4) +12 ) << 4);
-        starting_pos = GRID_POS(obj->x >> 4, (obj->y >> 4) + 12);
-    }
+    u16 starting_pos = GRID_POS(obj->x >> 4, obj->screen == &oamMain ? obj->y >> 4 : (obj->y >> 4) + 12);
 
     bin_heap_elem_t start = {starting_pos, 0};
     insert_priority_queue(&queue, start);

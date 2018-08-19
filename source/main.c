@@ -68,6 +68,7 @@ int main(void){
 
                     for (int i = 0; i < w.objectNumber; i++) {
                         if (w.objects[i].speed) {
+                            PRINT("obj %d\n", i);
                             dijkstra(&w, i);
                         }
                     }
@@ -83,11 +84,11 @@ int main(void){
             Object *cur = &w.objects[i];
 
             if (cur->speed) {
-                u8 x0 = GRID_XPOS(cur->path[cur->cur_path_index]);
-                u8 y0 = GRID_YPOS(cur->path[cur->cur_path_index]);
+                u8 x0 = cur->x >> 4;
+                u8 y0 = cur->screen == &oamMain ? cur->y >> 4 : (cur->y >> 4) + 12;
 
-                u8 x = GRID_XPOS(cur->path[cur->cur_path_index +1]);
-                u8 y = GRID_YPOS(cur->path[cur->cur_path_index +1]);
+                u8 x = GRID_XPOS(cur->path[cur->cur_path_index]);
+                u8 y = GRID_YPOS(cur->path[cur->cur_path_index]);
 
                 s8 dx = x - x0;
                 s8 dy = y - y0;
@@ -102,25 +103,21 @@ int main(void){
                 }
 
                 if (cur->y % 16 == 0 && cur->x % 16 == 0) {
+                    cur->cur_path_index++;
+
                     if (dy == 1 && y == 12) {
                         u8 newId = switchObjectScreen(&w, i);
-                        PRINT("y: %d\n", w.objects[newId].y);
-                        deleteObject(&w, i);
                     }
 
                     w.grid[x0][y0] = -1;
                     w.grid[x][y] = i;
 
-                    cur->cur_path_index++;
-
-                    if (cur->cur_path_index == cur->path_size - 1) {
+                    if (cur->cur_path_index == cur->path_size) {
                         cur->speed = 0; // TODO: Hacky object stop
                     }
                 }
             }
         }
-
-        //PRINT("x: %d, y: %d, rx: %d, ry: %d, z1: %d, z2: %d\n", t.px, t.py, t.rawx, t.rawy, t.z1, t.z2);
 
         Pressed = keysDown();
         Held = keysHeld();
