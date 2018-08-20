@@ -68,7 +68,6 @@ int main(void){
 
                     for (int i = 0; i < w.objectNumber; i++) {
                         if (w.objects[i].speed) {
-                            PRINT("obj %d\n", i);
                             dijkstra(&w, i);
                         }
                     }
@@ -97,17 +96,12 @@ int main(void){
                     sassert(dx == -1 || dx == 1, "Invalid path");
                     cur->x += dx;
                 }
-                if (dy) {
+                else if (dy) {
                     sassert(dy == -1 || dy == 1, "Invalid path");
                     cur->y += dy;
                 }
-
-                if (cur->y % 16 == 0 && cur->x % 16 == 0) {
+                else {
                     cur->cur_path_index++;
-
-                    if (dy == 1 && y == 12) {
-                        u8 newId = switchObjectScreen(&w, i);
-                    }
 
                     w.grid[x0][y0] = -1;
                     w.grid[x][y] = i;
@@ -115,6 +109,10 @@ int main(void){
                     if (cur->cur_path_index == cur->path_size) {
                         cur->speed = 0; // TODO: Hacky object stop
                     }
+                }
+
+                if (dy == 1 && y == 12) {
+                    u8 newId = switchObjectScreen(&w, i);
                 }
             }
         }
