@@ -54,6 +54,7 @@ int main(void){
     touchPosition t;
     u16 dt;
     u8 pressed = FALSE;
+    u8 needsDijkstra = FALSE;
     while(1){
         scanKeys();
         touchRead(&t);
@@ -66,11 +67,7 @@ int main(void){
                 if(w.grid[x >> 4][(y >> 4) + 12] == -1) {
                     newObject(&w, x, y, 0, &oamSub, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
 
-                    for (int i = 0; i < w.objectNumber; i++) {
-                        if (w.objects[i].speed) {
-                            dijkstra(&w, i);
-                        }
-                    }
+                    needsDijkstra = TRUE;
                 }
             }
             pressed = TRUE;
@@ -79,15 +76,26 @@ int main(void){
             pressed = FALSE;
         }
 
+#if 0
+        PRINT("\n");
+        for (int j = 0; j < 24; j++) {
+            for (int i = 0; i < 16; i++) {
+                PRINT("%d ", w.grid[i][j]);
+            }
+            PRINT("\n");
+        }
+        PRINT("\n");
+#endif
+
         for (int i = 0; i < w.objectNumber; i++) {
             Object *cur = &w.objects[i];
 
             if (cur->speed) {
-                u8 x0 = cur->x >> 4;
-                u8 y0 = cur->screen == &oamMain ? cur->y >> 4 : (cur->y >> 4) + 12;
+                u8 x0 = GRID_XPOS(cur->path[cur->cur_path_index]);
+                u8 y0 = GRID_YPOS(cur->path[cur->cur_path_index]);
 
-                u8 x = GRID_XPOS(cur->path[cur->cur_path_index]);
-                u8 y = GRID_YPOS(cur->path[cur->cur_path_index]);
+                u8 x = GRID_XPOS(cur->path[cur->cur_path_index +1]);
+                u8 y = GRID_YPOS(cur->path[cur->cur_path_index +1]);
 
                 s8 dx = x - x0;
                 s8 dy = y - y0;
@@ -96,18 +104,27 @@ int main(void){
                     sassert(dx == -1 || dx == 1, "Invalid path");
                     cur->x += dx;
                 }
-                else if (dy) {
+                if (dy) {
                     sassert(dy == -1 || dy == 1, "Invalid path");
                     cur->y += dy;
                 }
-                else {
+
+                if (cur->y % 16 == 0 && cur->x % 16 == 0) {
                     cur->cur_path_index++;
 
-                    w.grid[x0][y0] = -1;
+                    if (w.grid[x0][y0] == i) w.grid[x0][y0] = -1;
                     w.grid[x][y] = i;
 
-                    if (cur->cur_path_index == cur->path_size) {
+                    if (cur->cur_path_index >= cur->path_size -1) {
                         cur->speed = 0; // TODO: Hacky object stop
+                    }
+                    if (needsDijkstra) {
+                        for (int i = 0; i < w.objectNumber; i++) {
+                            if (w.objects[i].speed) {
+                                dijkstra(&w, i);
+                            }
+                        }
+                        needsDijkstra = FALSE;
                     }
                 }
 

@@ -249,7 +249,7 @@ void dijkstra(World *world, u16 id) {
 
         isfree = TRUE;
         if (world->grid[x-1][y] != -1) {
-            Object o = world->objects[world->grid[x+1][y]];
+            Object o = world->objects[world->grid[x-1][y]];
             if (!o.speed) {
                 isfree = FALSE;
             }
@@ -267,7 +267,7 @@ void dijkstra(World *world, u16 id) {
 
         isfree = TRUE;
         if (world->grid[x][y+1] != -1) {
-            Object o = world->objects[world->grid[x+1][y]];
+            Object o = world->objects[world->grid[x][y+1]];
             if (!o.speed) {
                 isfree = FALSE;
             }
@@ -285,7 +285,7 @@ void dijkstra(World *world, u16 id) {
 
         isfree = TRUE;
         if (world->grid[x][y-1] != -1) {
-            Object o = world->objects[world->grid[x+1][y]];
+            Object o = world->objects[world->grid[x][y-1]];
             if (!o.speed) {
                 isfree = FALSE;
             }
@@ -322,6 +322,7 @@ void dijkstra(World *world, u16 id) {
             obj->path[i++] = pos;
             pos = predecessor[pos];
         }
+        obj->path[i++] = starting_pos;
         obj->path_size = i;
     }
 
