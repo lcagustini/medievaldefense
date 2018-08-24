@@ -10,15 +10,9 @@
 void dijkstra(World *, u16);
 
 void updateObject(Object s){
-    bool hflip = false;
-    if(s.direction == DIR_RIGHT){
-        hflip = true;
-        s.direction = DIR_LEFT;
-    }
-
     oamSet(s.screen, // which display
             s.drawId, // the oam entry to set
-            s.x, s.y, // x & y location
+            f32toint(s.pos.x), f32toint(s.pos.y), // x & y location
             1, // priority
             s.palId, // palette for 16 color sprite or alpha for bmp sprite
             s.size, // size
@@ -27,9 +21,10 @@ void updateObject(Object s){
             -1, //affine index
             true, //double the size of rotated sprites
             false, //don't hide the sprite
-            hflip, false, //vflip, hflip
+            false, false, //vflip, hflip
             false //apply mosaic
           );
+
     DC_FlushAll();
     if(s.screen == &oamMain)
         dmaCopy(s.gfxData->pal, &SPRITE_PALETTE[16*s.palId], s.gfxData->palLen);
@@ -43,10 +38,59 @@ void updateScreens(World *w){
     oamClear(&oamMain, 0, 0);
     oamClear(&oamSub, 0, 0);
 
-    //fprintf(stderr, "%d\n", w->objectNumber);
     for(int i = 0; i < w->objectNumber; i++){
         updateObject(w->objects[i]);
     }
+    for(int i = 0; i < w->projectileNumber; i++){
+        updateObject(w->projectile[i]);
+    }
+}
+
+void deleteProjectile(World *w, u8 id) {
+    Object o = w->projectile[id];
+
+    oamFreeGfx(o.screen, o.gfx);
+    if (o.path) {
+        free(o.path);
+    }
+
+    w->projectileNumber--;
+    for (int i = id; i < w->projectileNumber; i++) {
+        w->projectile[i] = w->projectile[i+1];
+    }
+}
+
+u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, OamState* screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
+    sassert(w->objectNumber < SPRITE_COUNT, "Too many sprites!");
+
+    Object s = {0};
+    s.drawId = w->lastId;
+    s.pos.x = inttof32(x);
+    s.pos.y = inttof32(y);
+    s.gfx = oamAllocateGfx(screen, size, format);
+    s.screen = screen;
+    s.size = size;
+    s.color = format;
+    s.speed = speed;
+    s.gfxData = data;
+    s.palId = palId;
+
+    s.dir.x = w->objects[obj].pos.x - s.pos.x;
+    s.dir.y = w->objects[obj].pos.y - s.pos.y;
+
+    s32 norm = sqrtf32(mulf32(s.dir.x, s.dir.x) + mulf32(s.dir.y, s.dir.y));
+    sassert(norm != 0, "Invalid projectile target");
+
+    s.dir.x = divf32(s.dir.x, norm);
+    s.dir.y = divf32(s.dir.y, norm);
+
+    w->lastId++;
+
+    w->projectile[w->projectileNumber] = s;
+
+    w->projectileNumber++;
+
+    return w->projectileNumber-1;
 }
 
 void deleteObject(World *w, u8 id) {
@@ -74,22 +118,18 @@ void deleteObject(World *w, u8 id) {
     }
 }
 
-u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
+u8 newObject(World *w, int x, int y, s32 speed, OamState* screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
     sassert(w->objectNumber < SPRITE_COUNT, "Too many sprites!");
 
-    Object s;
+    Object s = {0};
     s.drawId = w->lastId;
-    s.x = x;
-    s.y = y;
+    s.pos.x = inttof32(x);
+    s.pos.y = inttof32(y);
     s.gfx = oamAllocateGfx(screen, size, format);
     s.screen = screen;
     s.size = size;
     s.color = format;
-    s.walking = FALSE;
-    s.direction = DIR_DOWN;
-    s.walked = 0;
     s.speed = speed;
-    s.priority = 0;
     s.gfxData = data;
     s.palId = palId;
 
@@ -98,9 +138,9 @@ u8 newObject(World *w, int x, int y, u8 speed, OamState* screen, SpriteSize size
     w->objects[w->objectNumber] = s;
 
     if (screen == &oamMain) {
-        w->grid[s.x >> 4][s.y >> 4] = w->objectNumber; 
+        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->objectNumber;
     } else {
-        w->grid[s.x >> 4][(s.y >> 4) + 12] = w->objectNumber; 
+        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->objectNumber;
     }
 
     if (s.speed) {
@@ -118,7 +158,7 @@ u8 switchObjectScreen(World *w, u8 obj) {
 
     deleteObject(w, obj);
 
-    return newObject(w, o.x, 0, o.speed, o.screen == &oamMain ? &oamSub : &oamMain, o.size, o.color, o.gfxData, o.palId);
+    return newObject(w, f32toint(o.pos.x), 0, o.speed, o.screen == &oamMain ? &oamSub : &oamMain, o.size, o.color, o.gfxData, o.palId);
 }
 
 void initialize_priority_queue(bin_heap_t *h) {
@@ -187,7 +227,7 @@ void dijkstra(World *world, u16 id) {
     queue.data = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(*queue.data));
     initialize_priority_queue(&queue);
 
-    u16 starting_pos = GRID_POS(obj->x >> 4, obj->screen == &oamMain ? obj->y >> 4 : (obj->y >> 4) + 12);
+    u16 starting_pos = GRID_POS(f32togrid(obj->pos.x), obj->screen == &oamMain ? f32togrid(obj->pos.y) : f32togrid(obj->pos.y) + 12);
 
     bin_heap_elem_t start = {starting_pos, 0};
     insert_priority_queue(&queue, start);
@@ -335,7 +375,7 @@ void dijkstra(World *world, u16 id) {
         }
     }
 
-#if 1
+#if 0
     PRINT("path: [");
     for (int i = 0; i < obj->path_size; i++) {
         PRINT("%d ", obj->path[i]);

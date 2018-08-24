@@ -2,7 +2,6 @@
 #include "types.h"
 
 #define PRINT(...) fprintf(stderr, __VA_ARGS__)
-#define f32togrid(a) ((f32toint(a)) >> (4))
 
 #include "object.c"
 #include "background.c"
@@ -10,7 +9,6 @@
 #include <teste.h>
 #include <tower.h>
 #include <troll.h>
-#include <shot.h>
 
 void setUpScreens(){
     videoSetMode(MODE_0_2D);
@@ -49,22 +47,17 @@ int main(void){
 
     CREATE_OBJECT_GFX(tower);
     CREATE_OBJECT_GFX(troll);
-    CREATE_OBJECT_GFX(shot);
-
     u8 troll_id = newObject(&w, 0, 0, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
     touchPosition t;
     u16 dt;
-    u16 secondTimer = 0;
     u8 pressed = FALSE;
     u8 needsDijkstra = FALSE;
     while(1){
         scanKeys();
         touchRead(&t);
-
-        secondTimer += dt;
 
         if(t.z1 != 0 && t.z2 != 0) {
             if(!pressed) {
@@ -109,14 +102,14 @@ int main(void){
 
                 if (dx) {
                     sassert(dx == -1 || dx == 1, "Invalid path");
-                    cur->pos.x += mulf32(cur->speed, inttof32(dx));
+                    cur->x += dx;
                 }
                 if (dy) {
                     sassert(dy == -1 || dy == 1, "Invalid path");
-                    cur->pos.y += mulf32(cur->speed, inttof32(dy));
+                    cur->y += dy;
                 }
 
-                if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0) {
+                if (cur->y % 16 == 0 && cur->x % 16 == 0) {
                     cur->cur_path_index++;
 
                     if (w.grid[x0][y0] == i) w.grid[x0][y0] = -1;
@@ -125,7 +118,7 @@ int main(void){
                     if (cur->cur_path_index >= cur->path_size -1) {
                         deleteObject(&w, i);
 
-                        troll_id = newObject(&w, 0, 0, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+                        newObject(&w, 0, 0, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
                     }
                     if (needsDijkstra) {
                         for (int i = 0; i < w.objectNumber; i++) {
@@ -138,43 +131,17 @@ int main(void){
                 }
 
                 if (dy == 1 && y == 12) {
-                    troll_id = switchObjectScreen(&w, i);
+                    u8 newId = switchObjectScreen(&w, i);
                 }
             }
-            else {
-                if (secondTimer > 32820) {
-                    if (w.objects[troll_id].screen == &oamSub) {
-                        newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, troll_id, 5, &oamSub, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < w.projectileNumber; i++) {
-            Object *cur = &w.projectile[i];
-
-            cur->pos.y += mulf32(cur->speed, cur->dir.y);
-            cur->pos.x += mulf32(cur->speed, cur->dir.x);
-
-            if (f32toint(cur->pos.y) < 0 ||
-                f32toint(cur->pos.x) < 0 ||
-                f32toint(cur->pos.y) > 192 ||
-                f32toint(cur->pos.x) > 256) {
-                deleteProjectile(&w, i);
-            }
-        }
-
-        if (secondTimer > 32820) {
-            secondTimer = 0;
         }
 
         Pressed = keysDown();
         Held = keysHeld();
+        dt = timerElapsed(0);
 
         bgUpdate();
         updateScreens(&w);
-
-        dt = timerElapsed(0);
 
         swiWaitForVBlank();
         oamUpdate(&oamSub);

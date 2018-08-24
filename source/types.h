@@ -31,8 +31,7 @@ typedef struct {
     bin_heap_elem_t *data;
 } bin_heap_t;
 
-typedef struct
-{
+typedef struct {
     const uint *tiles;
     u32 tilesLen;
     const u16 *pal;
@@ -41,20 +40,23 @@ typedef struct
     u32 mapLen;
 } gfx_t;
 
+typedef struct {
+    s32 x;
+    s32 y;
+} Vector;
+
 typedef struct{
     u8 drawId;
-    u16 x, y;
+    Vector pos;
     u16* gfx;
-    u8 walking;
-    u8 direction;
-    u8 walked;
-    u8 speed;
+    s32 speed;
     OamState* screen;
     SpriteSize size;
     SpriteColorFormat color;
     gfx_t *gfxData;
-    u8 priority;
     u8 palId;
+
+    Vector dir;
 
     u16 *path;
     u16 cur_path_index;
@@ -68,9 +70,13 @@ typedef struct{
 } Background;
 
 typedef struct{
-    Object objects[100];
-    Background bgs[4];
+    Object objects[50];
     u8 objectNumber;
+
+    Object projectile[100];
+    u8 projectileNumber;
+
+    Background bgs[4];
     u8 lastId;
     s16 grid[16][24];
     int camera_x;
