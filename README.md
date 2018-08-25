@@ -1,8 +1,8 @@
-# hellonds
-Nintendo DS game development playground
+# Medieval Defense
+Nintendo DS tower defense game
 
-Compiling:
+Compiling (requires DevKit Pro ARM):
 ```
 make
 ```
-You can run it in an emulator (Desmume) or real hardware.
+You can run it in on an emulator (Desmume) or real hardware.
