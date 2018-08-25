@@ -51,7 +51,7 @@ int main(void){
     CREATE_OBJECT_GFX(troll);
     CREATE_OBJECT_GFX(shot);
 
-    u8 troll_id = newObject(&w, 0, 0, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+    u8 troll_id = newObject(&w, 0, 0, 1 << 11, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
@@ -125,7 +125,7 @@ int main(void){
                     if (cur->cur_path_index >= cur->path_size -1) {
                         deleteObject(&w, i);
 
-                        troll_id = newObject(&w, 0, 0, 1, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+                        troll_id = newObject(&w, 0, 0, 1 << 11, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
                     }
                     if (needsDijkstra) {
                         for (int i = 0; i < w.objectNumber; i++) {
@@ -144,7 +144,7 @@ int main(void){
             else {
                 if (secondTimer > 32820) {
                     if (w.objects[troll_id].screen == &oamSub) {
-                        newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, troll_id, 5, &oamSub, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
+                        newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, troll_id, 5 << 12, &oamSub, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
                     }
                 }
             }
