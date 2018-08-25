@@ -116,7 +116,8 @@ int main(void){
                     cur->pos.y += mulf32(cur->speed, inttof32(dy));
                 }
 
-                if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0) {
+                if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0 &&
+                        f32togrid(cur->pos.y) + (cur->screen == &oamMain ? 0 : 12) == y && f32togrid(cur->pos.x) == x) {
                     cur->cur_path_index++;
 
                     if (w.grid[x0][y0] == i) w.grid[x0][y0] = -1;
