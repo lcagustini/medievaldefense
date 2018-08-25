@@ -57,3 +57,5 @@ dkms.conf
 
 # Build
 build/*
+*.arm9
+*.nds
