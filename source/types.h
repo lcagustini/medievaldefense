@@ -61,11 +61,16 @@ typedef struct{
     gfx_t *gfxData;
     u8 palId;
 
+    // projectile only
     Vector dir;
 
+    // monster only
     u16 *path;
     u16 cur_path_index;
     u16 path_size;
+
+    // tower only
+    u8 range;
 } Object;
 
 typedef struct{

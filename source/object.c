@@ -120,6 +120,7 @@ void deleteObject(World *w, u8 id) {
     }
 }
 
+#if 0
 u8 newObject(World *w, int x, int y, s32 speed, Screen screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
     sassert(w->projectileNumber + w->objectNumber < SPRITE_COUNT, "Too many sprites!");
 
@@ -152,13 +153,58 @@ u8 newObject(World *w, int x, int y, s32 speed, Screen screen, SpriteSize size, 
 
     return w->objectNumber-1;
 }
+#else
+u8 newObject(World *w, Object s){
+    sassert(w->projectileNumber + w->objectNumber < SPRITE_COUNT, "Too many sprites!");
+    // TODO: assert all fields are being filled correctly (whenever possible)
+    /*
+    s.pos.x = inttof32(x);
+    s.pos.y = inttof32(y);
+    s.screen = screen;
+    s.size = size;
+    s.color = format;
+    s.speed = speed;
+    s.gfxData = data;
+    s.palId = palId;
+    */
+
+    s.drawId = getDrawId(w, s.screen);
+    s.gfx = oamAllocateGfx(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, s.size, s.color);
+
+    w->objects[w->objectNumber] = s;
+
+    if (s.screen == MAIN_SCREEN) {
+        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->objectNumber;
+    } else {
+        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->objectNumber;
+    }
+
+    if (s.speed) {
+        s.path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
+        dijkstra(w, w->objectNumber);
+    }
+
+    w->objectNumber++;
+
+    return w->objectNumber-1;
+}
+#endif
 
 u8 switchObjectScreen(World *w, u8 obj) {
     Object o = w->objects[obj];
 
     deleteObject(w, obj);
 
-    return newObject(w, f32toint(o.pos.x), 0, o.speed, o.screen == MAIN_SCREEN ? SUB_SCREEN : MAIN_SCREEN, o.size, o.color, o.gfxData, o.palId);
+    Object n = {0};
+    n.pos.x = o.pos.x;
+    n.pos.y = 0;
+    n.screen = o.screen == MAIN_SCREEN ? SUB_SCREEN : MAIN_SCREEN;
+    n.size = o.size;
+    n.color = o.color;
+    n.speed = o.speed;
+    n.gfxData = o.gfxData;
+    n.palId = o.palId;
+    return newObject(w, n);
 }
 
 void initialize_priority_queue(bin_heap_t *h) {

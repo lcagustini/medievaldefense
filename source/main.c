@@ -52,7 +52,16 @@ int main(void){
     CREATE_OBJECT_GFX(troll);
     CREATE_OBJECT_GFX(shot);
 
-    u8 troll_id = newObject(&w, 0, 0, 1 << 11, MAIN_SCREEN, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+    Object o = {0};
+    o.pos.x = inttof32(0);
+    o.pos.y = inttof32(0);
+    o.screen = MAIN_SCREEN;
+    o.size = SpriteSize_16x16;
+    o.color = SpriteColorFormat_16Color;
+    o.speed = 1 << 11;
+    o.gfxData = &troll;
+    o.palId = 1;
+    newObject(&w, o);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
@@ -73,7 +82,17 @@ int main(void){
                 u8 y = (t.py >> 4) << 4;
 
                 if (y != 0 && w.grid[x >> 4][(y >> 4) + 12] == -1) {
-                    newObject(&w, x, y, 0, SUB_SCREEN, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
+                    Object o = {0};
+                    o.pos.x = inttof32(x);
+                    o.pos.y = inttof32(y);
+                    o.screen = SUB_SCREEN;
+                    o.size = SpriteSize_16x16;
+                    o.color = SpriteColorFormat_16Color;
+                    o.speed = 0;
+                    o.gfxData = &tower;
+                    o.palId = 0;
+                    o.range = 1;
+                    newObject(&w, o);
 
                     needsDijkstra = TRUE;
                 }
@@ -124,29 +143,72 @@ int main(void){
                     if (w.grid[x0][y0] == i) w.grid[x0][y0] = -1;
                     w.grid[x][y] = i;
 
+                    // TESTCODE: currently looping when monster gets to bottom
                     if (cur->cur_path_index >= cur->path_size -1) {
                         deleteObject(&w, i);
 
-                        troll_id = newObject(&w, 0, 0, 1 << 11, MAIN_SCREEN, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+                        Object o = {0};
+                        o.pos.x = inttof32(0);
+                        o.pos.y = inttof32(0);
+                        o.screen = MAIN_SCREEN;
+                        o.size = SpriteSize_16x16;
+                        o.color = SpriteColorFormat_16Color;
+                        o.speed = 1 << 11;
+                        o.gfxData = &troll;
+                        o.palId = 1;
+                        newObject(&w, o);
                     }
                     if (needsDijkstra) {
-                        for (int i = 0; i < w.objectNumber; i++) {
-                            if (w.objects[i].speed) {
-                                dijkstra(&w, i);
+                        for (int j = 0; j < w.objectNumber; j++) {
+                            if (w.objects[j].speed) {
+                                dijkstra(&w, j);
                             }
                         }
                         needsDijkstra = FALSE;
                     }
                 }
 
+                //PRINT("BEFORE %d\n", i);
                 if (dy == 1 && y == 12) {
-                    troll_id = switchObjectScreen(&w, i);
+                    PRINT("AFTER %d\n", i);
+                    switchObjectScreen(&w, i);
                 }
             }
             else {
                 if (secondTimer > 32820) {
-                    if (w.objects[troll_id].screen == SUB_SCREEN) {
-                        newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, troll_id, 5 << 12, SUB_SCREEN, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
+                    s16 candidate = -1;
+                    u8 candidate_path_size = 255;
+                    u8 grid_x = f32togrid(cur->pos.x);
+                    u8 grid_y = f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12);
+                    for (int j = -cur->range; j <= cur->range; j++) {
+                        for (int k = -cur->range; k <= cur->range; k++) {
+                            s8 test_candidate_x = grid_x + j;
+                            s8 test_candidate_y = grid_y + k;
+                            if (test_candidate_x >= 0 && test_candidate_y >= 12
+                                && test_candidate_x < 16 && test_candidate_y < 24) {
+                                u8 index;
+                                if ((index = w.grid[test_candidate_x][test_candidate_y]) != -1) {
+                                    Object monster = w.objects[index];
+                                    if (monster.speed) { // actually is a monster
+                                        if (candidate == -1) {
+                                            candidate = index;
+                                            candidate_path_size = monster.path_size - monster.cur_path_index;
+                                        } else {
+                                            if (candidate_path_size >
+                                                    monster.path_size - monster.cur_path_index) {
+                                                candidate = index;
+                                                candidate_path_size = monster.path_size - monster.cur_path_index;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (candidate != -1) { // has a target in range
+                        if (w.objects[candidate].screen == SUB_SCREEN) {
+                            newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, 5 << 12, SUB_SCREEN, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
+                        }
                     }
                 }
             }
@@ -175,7 +237,16 @@ int main(void){
 
         if (pressedKeys) {
             if (pressedKeys & KEY_A) {
-                PRINT("new\n");
+                Object o = {0};
+                o.pos.x = inttof32(0);
+                o.pos.y = inttof32(0);
+                o.screen = MAIN_SCREEN;
+                o.size = SpriteSize_16x16;
+                o.color = SpriteColorFormat_16Color;
+                o.speed = 1 << 11;
+                o.gfxData = &troll;
+                o.palId = 1;
+                newObject(&w, o);
             }
         }
 
