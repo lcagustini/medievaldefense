@@ -45,12 +45,17 @@ typedef struct {
     s32 y;
 } Vector;
 
+typedef enum{
+    MAIN_SCREEN,
+    SUB_SCREEN
+} Screen;
+
 typedef struct{
     u8 drawId;
     Vector pos;
     u16* gfx;
     s32 speed;
-    OamState* screen;
+    Screen screen;
     SpriteSize size;
     SpriteColorFormat color;
     gfx_t *gfxData;
@@ -77,15 +82,10 @@ typedef struct{
     u8 projectileNumber;
 
     Background bgs[4];
-    u8 lastId;
+    u8 freeDrawId[2][128];
     s16 grid[16][24];
     int camera_x;
     int camera_y;
 } World;
-
-typedef enum{
-    MAIN_SCREEN,
-    SUB_SCREEN
-} Screen;
 
 #endif

@@ -4,6 +4,7 @@
 #define PRINT(...) fprintf(stderr, __VA_ARGS__)
 #define f32togrid(a) ((f32toint(a)) >> (4))
 
+#include "world.c"
 #include "object.c"
 #include "background.c"
 
@@ -31,8 +32,8 @@ void setUpScreens(){
 }
 
 int main(void){
-    u16 Pressed;
-    u16 Held;
+    u16 pressedKeys;
+    u16 heldKeys;
 
     powerOn(POWER_ALL);
 
@@ -51,7 +52,7 @@ int main(void){
     CREATE_OBJECT_GFX(troll);
     CREATE_OBJECT_GFX(shot);
 
-    u8 troll_id = newObject(&w, 0, 0, 1 << 11, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+    u8 troll_id = newObject(&w, 0, 0, 1 << 11, MAIN_SCREEN, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
@@ -66,13 +67,13 @@ int main(void){
 
         secondTimer += dt;
 
-        if(t.z1 != 0 && t.z2 != 0) {
-            if(!pressed) {
+        if (t.z1 != 0 && t.z2 != 0) {
+            if (!pressed) {
                 u8 x = (t.px >> 4) << 4;
                 u8 y = (t.py >> 4) << 4;
 
-                if(y != 0 && w.grid[x >> 4][(y >> 4) + 12] == -1) {
-                    newObject(&w, x, y, 0, &oamSub, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
+                if (y != 0 && w.grid[x >> 4][(y >> 4) + 12] == -1) {
+                    newObject(&w, x, y, 0, SUB_SCREEN, SpriteSize_16x16, SpriteColorFormat_16Color, &tower, 0);
 
                     needsDijkstra = TRUE;
                 }
@@ -117,7 +118,7 @@ int main(void){
                 }
 
                 if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0 &&
-                        f32togrid(cur->pos.y) + (cur->screen == &oamMain ? 0 : 12) == y && f32togrid(cur->pos.x) == x) {
+                        f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12) == y && f32togrid(cur->pos.x) == x) {
                     cur->cur_path_index++;
 
                     if (w.grid[x0][y0] == i) w.grid[x0][y0] = -1;
@@ -126,7 +127,7 @@ int main(void){
                     if (cur->cur_path_index >= cur->path_size -1) {
                         deleteObject(&w, i);
 
-                        troll_id = newObject(&w, 0, 0, 1 << 11, &oamMain, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
+                        troll_id = newObject(&w, 0, 0, 1 << 11, MAIN_SCREEN, SpriteSize_16x16, SpriteColorFormat_16Color, &troll, 1);
                     }
                     if (needsDijkstra) {
                         for (int i = 0; i < w.objectNumber; i++) {
@@ -144,8 +145,8 @@ int main(void){
             }
             else {
                 if (secondTimer > 32820) {
-                    if (w.objects[troll_id].screen == &oamSub) {
-                        newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, troll_id, 5 << 12, &oamSub, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
+                    if (w.objects[troll_id].screen == SUB_SCREEN) {
+                        newProjectile(&w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, troll_id, 5 << 12, SUB_SCREEN, SpriteSize_8x8, SpriteColorFormat_16Color, &shot, 2);
                     }
                 }
             }
@@ -169,8 +170,14 @@ int main(void){
             secondTimer = 0;
         }
 
-        Pressed = keysDown();
-        Held = keysHeld();
+        pressedKeys = keysDown();
+        heldKeys = keysHeld();
+
+        if (pressedKeys) {
+            if (pressedKeys & KEY_A) {
+                PRINT("new\n");
+            }
+        }
 
         bgUpdate();
         updateScreens(&w);
