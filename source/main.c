@@ -66,12 +66,15 @@ int main(void){
     u16 heldKeys;
     touchPosition t;
 
-    u16 dt;
+    u16 dt = 0;
     u16 secondTimer = 0;
     u8 pressed = FALSE;
     u8 needsDijkstra = FALSE;
     while(1){
         scanKeys();
+        pressedKeys = keysDown();
+        heldKeys = keysHeld();
+
         touchRead(&t);
 
         secondTimer += dt;
@@ -115,6 +118,12 @@ int main(void){
                 o.gfxData = &troll;
                 o.palId = 1;
                 newObject(&w, o);
+            }
+
+            if (pressedKeys & KEY_B) {
+                for (int i = 0; i < w.objectNumber; i++) {
+                    PRINT("id %d -> path=%p\n", i, w.objects[i].path);
+                }
             }
         }
 
@@ -247,9 +256,6 @@ int main(void){
         if (secondTimer > 32820) {
             secondTimer = 0;
         }
-
-        pressedKeys = keysDown();
-        heldKeys = keysHeld();
 
         bgUpdate();
         updateScreens(&w);
