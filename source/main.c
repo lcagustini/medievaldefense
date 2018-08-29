@@ -32,9 +32,6 @@ void setUpScreens(){
 }
 
 int main(void){
-    u16 pressedKeys;
-    u16 heldKeys;
-
     powerOn(POWER_ALL);
 
     consoleDebugInit(DebugDevice_NOCASH);
@@ -65,7 +62,10 @@ int main(void){
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
+    u16 pressedKeys;
+    u16 heldKeys;
     touchPosition t;
+
     u16 dt;
     u16 secondTimer = 0;
     u8 pressed = FALSE;
@@ -101,6 +101,21 @@ int main(void){
         }
         else {
             pressed = FALSE;
+        }
+
+        if (pressedKeys) {
+            if (pressedKeys & KEY_A) {
+                Object o = {0};
+                o.pos.x = inttof32(0);
+                o.pos.y = inttof32(0);
+                o.screen = MAIN_SCREEN;
+                o.size = SpriteSize_16x16;
+                o.color = SpriteColorFormat_16Color;
+                o.speed = 1 << 11;
+                o.gfxData = &troll;
+                o.palId = 1;
+                newObject(&w, o);
+            }
         }
 
 #if 0
@@ -147,6 +162,7 @@ int main(void){
                     if (cur->cur_path_index >= cur->path_size -1) {
                         deleteObject(&w, i);
 
+#if 0
                         Object o = {0};
                         o.pos.x = inttof32(0);
                         o.pos.y = inttof32(0);
@@ -157,7 +173,13 @@ int main(void){
                         o.gfxData = &troll;
                         o.palId = 1;
                         newObject(&w, o);
+#endif
                     }
+
+                    if (dy == 1 && y == 12) {
+                        switchObjectScreen(&w, i);
+                    }
+
                     if (needsDijkstra) {
                         for (int j = 0; j < w.objectNumber; j++) {
                             if (w.objects[j].speed) {
@@ -166,12 +188,6 @@ int main(void){
                         }
                         needsDijkstra = FALSE;
                     }
-                }
-
-                //PRINT("BEFORE %d\n", i);
-                if (dy == 1 && y == 12) {
-                    PRINT("AFTER %d\n", i);
-                    switchObjectScreen(&w, i);
                 }
             }
             else {
@@ -234,21 +250,6 @@ int main(void){
 
         pressedKeys = keysDown();
         heldKeys = keysHeld();
-
-        if (pressedKeys) {
-            if (pressedKeys & KEY_A) {
-                Object o = {0};
-                o.pos.x = inttof32(0);
-                o.pos.y = inttof32(0);
-                o.screen = MAIN_SCREEN;
-                o.size = SpriteSize_16x16;
-                o.color = SpriteColorFormat_16Color;
-                o.speed = 1 << 11;
-                o.gfxData = &troll;
-                o.palId = 1;
-                newObject(&w, o);
-            }
-        }
 
         bgUpdate();
         updateScreens(&w);
