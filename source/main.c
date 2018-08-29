@@ -1,17 +1,33 @@
 #include <nds.h>
 #include "types.h"
 
-#define PRINT(...) fprintf(stderr, __VA_ARGS__)
-#define f32togrid(a) ((f32toint(a)) >> (4))
-
 #include "world.c"
-#include "object.c"
+#include "projectiles.c"
+#include "monsters.c"
+#include "towers.c"
 #include "background.c"
 
 #include <teste.h>
 #include <tower.h>
 #include <troll.h>
 #include <shot.h>
+
+void updateScreens(World *w){
+    oamClear(&oamMain, 0, 0);
+    oamClear(&oamSub, 0, 0);
+
+    for(int i = 0; i < w->monsterNumber; i++){
+        updateMonster(w->monsters[i]);
+    }
+
+    for(int i = 0; i < w->towerNumber; i++){
+        updateTower(w->towers[i]);
+    }
+
+    for(int i = 0; i < w->projectileNumber; i++){
+        updateProjectile(w->projectile[i]);
+    }
+}
 
 void setUpScreens(){
     videoSetMode(MODE_0_2D);
