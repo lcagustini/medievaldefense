@@ -120,40 +120,6 @@ void deleteObject(World *w, u8 id) {
     }
 }
 
-#if 0
-u8 newObject(World *w, int x, int y, s32 speed, Screen screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
-    sassert(w->projectileNumber + w->objectNumber < SPRITE_COUNT, "Too many sprites!");
-
-    Object s = {0};
-    s.drawId = getDrawId(w, screen);
-    s.pos.x = inttof32(x);
-    s.pos.y = inttof32(y);
-    s.gfx = oamAllocateGfx(screen == MAIN_SCREEN ? &oamMain : &oamSub, size, format);
-    s.screen = screen;
-    s.size = size;
-    s.color = format;
-    s.speed = speed;
-    s.gfxData = data;
-    s.palId = palId;
-
-    w->objects[w->objectNumber] = s;
-
-    if (screen == MAIN_SCREEN) {
-        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->objectNumber;
-    } else {
-        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->objectNumber;
-    }
-
-    if (s.speed) {
-        s.path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
-        dijkstra(w, w->objectNumber);
-    }
-
-    w->objectNumber++;
-
-    return w->objectNumber-1;
-}
-#else
 u8 newObject(World *w, Object s){
     sassert(w->projectileNumber + w->objectNumber < SPRITE_COUNT, "Too many sprites!");
     // TODO: assert all fields are being filled correctly (whenever possible)
@@ -180,7 +146,7 @@ u8 newObject(World *w, Object s){
     }
 
     if (s.speed) {
-        s.path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
+        w->objects[w->objectNumber].path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
         dijkstra(w, w->objectNumber);
     }
 
@@ -188,7 +154,6 @@ u8 newObject(World *w, Object s){
 
     return w->objectNumber-1;
 }
-#endif
 
 u8 switchObjectScreen(World *w, u8 obj) {
     Object o = w->objects[obj];
