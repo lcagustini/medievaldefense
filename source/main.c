@@ -127,6 +127,7 @@ int main(void){
                 o.pos.x = inttof32(0);
                 o.pos.y = inttof32(0);
                 o.screen = MAIN_SCREEN;
+                o.health = 5;
                 o.speed = 1 << 11;
                 newMonster(&w, o);
             }
@@ -161,8 +162,6 @@ int main(void){
 
             s8 dx = x - x0;
             s8 dy = y - y0;
-
-            PRINT("%d -> path=%d x= %d y=%d\n", i, cur->cur_path_index, x, y);
 
             if (dx) {
                 sassert(dx == -1 || dx == 1, "Invalid path");
@@ -207,6 +206,10 @@ int main(void){
                     needsDijkstra[i] = FALSE;
                 }
             }
+
+            if (cur->health == 0) {
+                deleteMonster(&w, i);
+            }
         }
 
         for (int i = 0; i < w.towerNumber; i++) {
@@ -248,13 +251,28 @@ int main(void){
             }
         }
 
+#if 0
+        for (int i = 0; i < 24; i++) {
+            for (int j = 0; j < 16; j++) {
+                PRINT("%2d ", w.monsterGrid[j][i]);
+            }
+            PRINT("\n");
+        }
+        PRINT("\n");
+#endif
+
         for (int i = 0; i < w.projectileNumber; i++) {
             Projectile *cur = &w.projectiles[i];
 
             cur->pos.y += mulf32(cur->speed, cur->dir.y);
             cur->pos.x += mulf32(cur->speed, cur->dir.x);
 
-            if (f32toint(cur->pos.y) < 0 ||
+            s16 index = w.monsterGrid[f32togrid(cur->pos.x)][f32togrid(cur->pos.y)+12];
+            if (index != -1) {
+                w.monsters[index].health--;
+                deleteProjectile(&w, i);
+            }
+            else if (f32toint(cur->pos.y) < 0 ||
                     f32toint(cur->pos.x) < 0 ||
                     f32toint(cur->pos.y) > 192 ||
                     f32toint(cur->pos.x) > 256) {

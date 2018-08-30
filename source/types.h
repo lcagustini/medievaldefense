@@ -86,6 +86,7 @@ typedef struct {
 
     Vector pos;
     Screen screen;
+    u8 health;
     s32 speed;
 
     u16 *path;

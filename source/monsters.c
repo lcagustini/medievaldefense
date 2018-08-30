@@ -88,16 +88,9 @@ u8 switchMonsterScreen(World *w, u8 obj) {
 
     deleteMonster(w, obj);
 
-    Monster n = {0};
-    n.pos.x = o.pos.x;
-    n.pos.y = 0;
-    n.screen = o.screen == MAIN_SCREEN ? SUB_SCREEN : MAIN_SCREEN;
-    n.size = o.size;
-    n.color = o.color;
-    n.speed = o.speed;
-    n.gfxData = o.gfxData;
-    n.palId = o.palId;
-    return newMonster(w, n);
+    o.pos.y = 0;
+    o.screen = o.screen == MAIN_SCREEN ? SUB_SCREEN : MAIN_SCREEN;
+    return newMonster(w, o);
 }
 
 void initialize_priority_queue(bin_heap_t *h) {
