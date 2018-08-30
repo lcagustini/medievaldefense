@@ -75,7 +75,7 @@ int main(void){
     u16 dt = 0;
     u16 secondTimer = 0;
     u8 pressed = FALSE;
-    u8 needsDijkstra = FALSE;
+    u8 needsDijkstra[MONSTER_COUNT] = {0};
     while(1){
         scanKeys();
         pressedKeys = keysDown();
@@ -101,10 +101,12 @@ int main(void){
                     o.pos.x = inttof32(x);
                     o.pos.y = inttof32(y);
                     o.screen = SUB_SCREEN;
-                    o.range = 1;
+                    o.range = 2;
                     newTower(&w, o);
 
-                    needsDijkstra = TRUE;
+                    for (int i = 0; i < w.monsterNumber; i++) {
+                        needsDijkstra[i] = TRUE;
+                    }
                 }
             }
             pressed = TRUE;
@@ -197,14 +199,12 @@ int main(void){
                 if (dy == 1 && y == 12) {
                     switchMonsterScreen(&w, i);
                 }
-            }
-        }
 
-        if (needsDijkstra) {
-            for (int j = 0; j < w.monsterNumber; j++) {
-                dijkstra(&w, j);
+                if (needsDijkstra[i]) {
+                    dijkstra(&w, i);
+                    needsDijkstra[i] = FALSE;
+                }
             }
-            needsDijkstra = FALSE;
         }
 
         for (int i = 0; i < w.towerNumber; i++) {

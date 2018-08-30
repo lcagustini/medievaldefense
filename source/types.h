@@ -8,7 +8,7 @@
 
 #define PROJECTILE_COUNT 100
 #define MONSTER_COUNT 25
-#define TOWER_COUNT 25
+#define TOWER_COUNT 50
 
 #define GRID_POS(x, y) (((y) << 4) + (x))
 #define GRID_XPOS(coord) ((coord) % 16)
