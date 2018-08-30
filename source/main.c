@@ -162,6 +162,8 @@ int main(void){
             s8 dx = x - x0;
             s8 dy = y - y0;
 
+            PRINT("%d -> path=%d x= %d y=%d\n", i, cur->cur_path_index, x, y);
+
             if (dx) {
                 sassert(dx == -1 || dx == 1, "Invalid path");
                 cur->pos.x += mulf32(cur->speed, inttof32(dx));
