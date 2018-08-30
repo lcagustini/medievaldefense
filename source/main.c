@@ -12,6 +12,14 @@
 #include <troll.h>
 #include <shot.h>
 
+u8 state = 128;
+u8 xorshift() {
+	state ^= state << 7;
+	state ^= state >> 5;
+	state ^= state << 3;
+    return state;
+}
+
 void updateScreens(World *w){
     oamClear(&oamMain, 0, 0);
     oamClear(&oamSub, 0, 0);
@@ -85,7 +93,7 @@ int main(void){
 
         secondTimer += dt;
 
-        if (t.z1 != 0 && t.z2 != 0) {
+        if (t.px != 0 && t.py != 0) {
             if (!pressed) {
                 u8 x = (t.px >> 4) << 4;
                 u8 y = (t.py >> 4) << 4;
@@ -124,7 +132,7 @@ int main(void){
 
                 o.gfxData = &troll;
 
-                o.pos.x = inttof32(0);
+                o.pos.x = inttof32(16 * (xorshift() % 16));
                 o.pos.y = inttof32(0);
                 o.screen = MAIN_SCREEN;
                 o.health = 5;
@@ -207,7 +215,7 @@ int main(void){
                 }
             }
 
-            if (cur->health == 0) {
+            if (cur->health <= 0) {
                 deleteMonster(&w, i);
             }
         }

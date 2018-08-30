@@ -16,7 +16,7 @@ void updateMonster(Monster s){
             false //apply mosaic
           );
 
-    DC_FlushAll();
+    //DC_FlushAll();
     if (s.screen == MAIN_SCREEN)
         dmaCopy(s.gfxData->pal, &SPRITE_PALETTE[16*s.palId], s.gfxData->palLen);
     else
