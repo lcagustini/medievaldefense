@@ -24,7 +24,7 @@ void updateProjectile(Projectile s){
 }
 
 void deleteProjectile(World *w, u8 id) {
-    Projectile o = w->projectile[id];
+    Projectile o = w->projectiles[id];
 
     freeDrawId(w, o.screen, o.drawId);
 
@@ -32,7 +32,7 @@ void deleteProjectile(World *w, u8 id) {
 
     w->projectileNumber--;
     for (int i = id; i < w->projectileNumber; i++) {
-        w->projectile[i] = w->projectile[i+1];
+        w->projectiles[i] = w->projectiles[i+1];
     }
 }
 
@@ -60,7 +60,7 @@ u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, Screen screen, Sprit
     s.dir.x = divf32(s.dir.x, norm);
     s.dir.y = divf32(s.dir.y, norm);
 
-    w->projectile[w->projectileNumber] = s;
+    w->projectiles[w->projectileNumber] = s;
 
     w->projectileNumber++;
 

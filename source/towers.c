@@ -37,11 +37,11 @@ void deleteTower(World *w, u8 id) {
 
     for (int i = 0; i < 16; i++) {
         for (int j = 0; j < 24; j++) {
-            if (w->grid[i][j] == id) {
-                w->grid[i][j] = -1;
+            if (w->towerGrid[i][j] == id) {
+                w->towerGrid[i][j] = -1;
             }
-            else if (w->grid[i][j] > id) {
-                w->grid[i][j]--;
+            else if (w->towerGrid[i][j] > id) {
+                w->towerGrid[i][j]--;
             }
         }
     }
@@ -67,9 +67,9 @@ u8 newTower(World *w, Tower s){
     w->towers[w->towerNumber] = s;
 
     if (s.screen == MAIN_SCREEN) {
-        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->towerNumber;
+        w->towerGrid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->towerNumber;
     } else {
-        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->towerNumber;
+        w->towerGrid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->towerNumber;
     }
 
     w->towerNumber++;

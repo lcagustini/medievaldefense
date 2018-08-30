@@ -40,11 +40,11 @@ void deleteMonster(World *w, u8 id) {
 
     for (int i = 0; i < 16; i++) {
         for (int j = 0; j < 24; j++) {
-            if (w->grid[i][j] == id) {
-                w->grid[i][j] = -1;
+            if (w->monsterGrid[i][j] == id) {
+                w->monsterGrid[i][j] = -1;
             }
-            else if (w->grid[i][j] > id) {
-                w->grid[i][j]--;
+            else if (w->monsterGrid[i][j] > id) {
+                w->monsterGrid[i][j]--;
             }
         }
     }
@@ -70,9 +70,9 @@ u8 newMonster(World *w, Monster s){
     w->monsters[w->monsterNumber] = s;
 
     if (s.screen == MAIN_SCREEN) {
-        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->monsterNumber;
+        w->monsterGrid[f32togrid(s.pos.x)][f32togrid(s.pos.y)] = w->monsterNumber;
     } else {
-        w->grid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->monsterNumber;
+        w->monsterGrid[f32togrid(s.pos.x)][f32togrid(s.pos.y) + 12] = w->monsterNumber;
     }
 
     w->monsters[w->monsterNumber].path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
@@ -206,17 +206,9 @@ void dijkstra(World *world, u16 id) {
         }
 
         u16 pos;
-        u8 isfree;
 
         pos = GRID_POS(x + 1, y);
-        isfree = TRUE;
-        if (world->grid[x+1][y] != -1) {
-            Object o = world->objects[world->grid[x+1][y]];
-            if (!o.speed) {
-                isfree = FALSE;
-            }
-        }
-        if (x + 1 < 16 && visited[pos] != 2 && isfree) {
+        if (x + 1 < 16 && visited[pos] != 2 && world->towerGrid[x+1][y] == -1) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
@@ -226,15 +218,8 @@ void dijkstra(World *world, u16 id) {
             }
         }
 
-        isfree = TRUE;
-        if (world->grid[x-1][y] != -1) {
-            Object o = world->objects[world->grid[x-1][y]];
-            if (!o.speed) {
-                isfree = FALSE;
-            }
-        }
         pos = GRID_POS(x - 1, y);
-        if (x - 1 >= 0 && visited[pos] != 2 && isfree) {
+        if (x - 1 >= 0 && visited[pos] != 2 && world->towerGrid[x-1][y] == -1) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
@@ -244,15 +229,8 @@ void dijkstra(World *world, u16 id) {
             }
         }
 
-        isfree = TRUE;
-        if (world->grid[x][y+1] != -1) {
-            Object o = world->objects[world->grid[x][y+1]];
-            if (!o.speed) {
-                isfree = FALSE;
-            }
-        }
         pos = GRID_POS(x, y + 1);
-        if (y + 1 < 24 && visited[pos] != 2 && isfree) {
+        if (y + 1 < 24 && visited[pos] != 2 && world->towerGrid[x][y+1] == -1) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
@@ -262,15 +240,8 @@ void dijkstra(World *world, u16 id) {
             }
         }
 
-        isfree = TRUE;
-        if (world->grid[x][y-1] != -1) {
-            Object o = world->objects[world->grid[x][y-1]];
-            if (!o.speed) {
-                isfree = FALSE;
-            }
-        }
         pos = GRID_POS(x, y - 1);
-        if (y - 1 >= 0 && visited[pos] != 2 && isfree) {
+        if (y - 1 >= 0 && visited[pos] != 2 && world->towerGrid[x][y-1] == -1) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;

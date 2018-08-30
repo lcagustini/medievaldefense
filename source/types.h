@@ -122,10 +122,12 @@ typedef struct {
     Tower towers[TOWER_COUNT];
     u8 towerNumber;
 
-    Projectile projectile[PROJECTILE_COUNT];
+    Projectile projectiles[PROJECTILE_COUNT];
     u8 projectileNumber;
 
     Background bgs[4];
     u8 freeDrawId[2][128];
-    s16 grid[16][24];
+
+    s16 monsterGrid[16][24];
+    s16 towerGrid[16][24];
 } World;
