@@ -37,7 +37,7 @@ void deleteProjectile(World *w, u8 id) {
 }
 
 u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, Screen screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
-    sassert(w->projectileNumber < PROJECTILE_COUNT && w->projectileNumber + w->monsterNumber + w->towerNumber < SPRITE_COUNT, "Too many sprites!");
+    sassert(w->projectileNumber < PROJECTILE_COUNT, "Too many sprites!");
 
     Projectile s = {0};
     s.drawId = getDrawId(w, screen);

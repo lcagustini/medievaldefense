@@ -48,7 +48,7 @@ void deleteTower(World *w, u8 id) {
 }
 
 u8 newTower(World *w, Tower s){
-    sassert(w->towerNumber < TOWER_COUNT && w->projectileNumber + w->monsterNumber + w->towerNumber < SPRITE_COUNT, "Too many sprites!");
+    sassert(w->towerNumber < TOWER_COUNT, "Too many sprites!");
     // TODO: assert all fields are being filled correctly (whenever possible)
     /*
     s.pos.x = inttof32(x);

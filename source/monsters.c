@@ -51,7 +51,7 @@ void deleteMonster(World *w, u8 id) {
 }
 
 u8 newMonster(World *w, Monster s){
-    sassert(w->monsterNumber < MONSTER_COUNT && w->projectileNumber + w->monsterNumber + w->towerNumber < SPRITE_COUNT, "Too many sprites!");
+    sassert(w->monsterNumber < MONSTER_COUNT, "Too many sprites!");
     // TODO: assert all fields are being filled correctly (whenever possible)
     /*
     s.pos.x = inttof32(x);

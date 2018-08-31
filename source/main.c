@@ -12,12 +12,11 @@
 #include <troll.h>
 #include <shot.h>
 
-u8 state = 128;
-u8 xorshift() {
-	state ^= state << 7;
-	state ^= state >> 5;
-	state ^= state << 3;
-    return state;
+u8 xorshift(u8 *state) {
+    *state ^= *state << 7;
+    *state ^= *state >> 5;
+    *state ^= *state << 3;
+    return *state;
 }
 
 void updateScreens(World *w){
@@ -82,6 +81,8 @@ int main(void){
 
     u16 dt = 0;
     u16 secondTimer = 0;
+    u8 state = 128;
+
     u8 pressed = FALSE;
     u8 needsDijkstra[MONSTER_COUNT] = {0};
     while(1){
@@ -132,7 +133,7 @@ int main(void){
 
                 o.gfxData = &troll;
 
-                o.pos.x = inttof32(16 * (xorshift() % 16));
+                o.pos.x = inttof32((xorshift(&state) % 16) << 4);
                 o.pos.y = inttof32(0);
                 o.screen = MAIN_SCREEN;
                 o.health = 5;
@@ -289,6 +290,20 @@ int main(void){
         }
 
         if (secondTimer > 32820) {
+            Monster o = {0};
+            o.size = SpriteSize_16x16;
+            o.color = SpriteColorFormat_16Color;
+            o.palId = 1;
+
+            o.gfxData = &troll;
+
+            o.pos.x = inttof32((xorshift(&state) % 16) << 4);
+            o.pos.y = inttof32(0);
+            o.screen = MAIN_SCREEN;
+            o.health = 5;
+            o.speed = 1 << 11;
+            newMonster(&w, o);
+
             secondTimer = 0;
         }
 
