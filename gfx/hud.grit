@@ -1,9 +1,8 @@
 -m
 -gt
--gB4
--pn16
--ps0
--pT0
+-gB8
+-pn256
 -gTFF00FF
--mLf
--mR4
+-mLs
+-mR8
+-ps0

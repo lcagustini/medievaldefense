@@ -49,6 +49,9 @@ void setUpScreens(){
 
     oamInit(&oamMain, SpriteMapping_1D_128, true);
     oamInit(&oamSub, SpriteMapping_1D_128, true);
+
+    bgExtPaletteEnable();
+    bgExtPaletteEnableSub();
 }
 
 int main(void){
@@ -78,10 +81,16 @@ int main(void){
         w.gfx[HUD] = hud;
     }
 
-    //newBackground(&w, 3, &w.gfx[HUD], BgType_Text4bpp, BgSize_T_256x256, 2, 1, SUB_SCREEN);
+    vramSetBankH(VRAM_H_LCD);
+    vramSetBankE(VRAM_E_LCD);
 
-    newBackground(&w, 1, &w.gfx[GRASS], BgType_Text4bpp, BgSize_T_256x256, 1, 0, MAIN_SCREEN);
-    newBackground(&w, 2, &w.gfx[GRASS], BgType_Text4bpp, BgSize_T_256x256, 3, 0, SUB_SCREEN);
+    newBackground(&w, 1, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 1, 0, MAIN_SCREEN);
+    newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 3, 0, SUB_SCREEN);
+
+    newBackground(&w, 0, &w.gfx[HUD], BgType_Text8bpp, BgSize_T_256x256, 2, 1, SUB_SCREEN);
+
+    vramSetBankH(VRAM_H_SUB_BG_EXT_PALETTE);
+    vramSetBankE(VRAM_E_BG_EXT_PALETTE);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
