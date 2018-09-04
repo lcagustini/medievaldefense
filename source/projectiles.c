@@ -1,4 +1,4 @@
-void updateProjectile(Projectile s){
+void drawProjectile(Projectile s){
     oamSet(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, // which display
             s.drawId, // the oam entry to set
             f32toint(s.pos.x), f32toint(s.pos.y), // x & y location
@@ -44,6 +44,7 @@ u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, Screen screen, Sprit
     s.pos.x = inttof32(x);
     s.pos.y = inttof32(y);
     s.gfxPtr = oamAllocateGfx(screen == MAIN_SCREEN ? &oamMain : &oamSub, size, format);
+    s.player = w->monsters[obj].player == PLAYER_1 ? PLAYER_2 : PLAYER_1;
     s.screen = screen;
     s.size = size;
     s.color = format;
@@ -65,4 +66,25 @@ u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, Screen screen, Sprit
     w->projectileNumber++;
 
     return w->projectileNumber-1;
+}
+
+void updateProjectile(World *w, u8 i) {
+    Projectile *cur = &w->projectiles[i];
+
+    cur->pos.y += mulf32(cur->speed, cur->dir.y);
+    cur->pos.x += mulf32(cur->speed, cur->dir.x);
+
+    s16 index = w->monsterGrid[f32togrid(cur->pos.x)][f32togrid(cur->pos.y)+12];
+    if (index != -1) {
+        if (cur->player != w->monsters[index].player) {
+            w->monsters[index].health--;
+            deleteProjectile(w, i);
+        }
+    }
+    else if (f32toint(cur->pos.y) < 0 ||
+            f32toint(cur->pos.x) < 0 ||
+            f32toint(cur->pos.y) > 192 ||
+            f32toint(cur->pos.x) > 256) {
+        deleteProjectile(w, i);
+    }
 }

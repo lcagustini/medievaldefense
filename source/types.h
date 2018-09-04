@@ -29,8 +29,6 @@
 #define CREATE_OBJECT_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a)};
 #define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a), MAP(a), MAP_LEN(a)};
 
-enum Directions{DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT};
-
 typedef struct {
     u16 id;
     u16 value;
@@ -58,8 +56,13 @@ typedef struct {
 
 typedef enum {
     MAIN_SCREEN,
-    SUB_SCREEN
+    SUB_SCREEN,
 } Screen;
+
+typedef enum {
+    PLAYER_1,
+    PLAYER_2,
+} Player;
 
 typedef struct {
     u8 drawId;
@@ -72,7 +75,9 @@ typedef struct {
 
     Vector pos;
     Screen screen;
+    Player player;
     u8 range;
+    u8 timer;
 } Tower;
 
 typedef struct {
@@ -86,6 +91,7 @@ typedef struct {
 
     Vector pos;
     Screen screen;
+    Player player;
     s8 health;
     s32 speed;
 
@@ -105,19 +111,29 @@ typedef struct {
 
     Vector pos;
     Screen screen;
+    Player player;
     s32 speed;
 
     Vector dir;
 } Projectile;
 
 typedef struct {
-    int id;
+    u8 id;
     gfx_t *data;
     u8 layer;
 } Background;
 
+typedef enum {
+    GRASS,
+    TOWER,
+    TROLL,
+    SHOT,
+    HUD,
+} Graphics;
+
 typedef struct {
     Monster monsters[MONSTER_COUNT];
+    u8 needsDijkstra[MONSTER_COUNT];
     u8 monsterNumber;
 
     Tower towers[TOWER_COUNT];
@@ -126,8 +142,12 @@ typedef struct {
     Projectile projectiles[PROJECTILE_COUNT];
     u8 projectileNumber;
 
-    Background bgs[4];
+    u8 random;
+
+    gfx_t gfx[10];
     u8 freeDrawId[2][128];
+
+    Background bgs[4];
 
     s16 monsterGrid[16][24];
     s16 towerGrid[16][24];

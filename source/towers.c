@@ -1,4 +1,4 @@
-void updateTower(Tower s){
+void drawTower(Tower s){
     oamSet(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, // which display
             s.drawId, // the oam entry to set
             f32toint(s.pos.x), f32toint(s.pos.y), // x & y location
@@ -75,4 +75,45 @@ u8 newTower(World *w, Tower s){
     w->towerNumber++;
 
     return w->towerNumber-1;
+}
+
+void updateTower(World *w, u8 i) {
+    Tower *cur = &w->towers[i];
+
+    if (cur->timer == 10) {
+        s16 candidate = -1;
+        u8 candidate_path_size = 255;
+        u8 grid_x = f32togrid(cur->pos.x);
+        u8 grid_y = f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12);
+        for (int j = -cur->range; j <= cur->range; j++) {
+            for (int k = -cur->range; k <= cur->range; k++) {
+                s8 test_candidate_x = grid_x + j;
+                s8 test_candidate_y = grid_y + k;
+                if (test_candidate_x >= 0 && test_candidate_y >= 12 && test_candidate_x < 16 && test_candidate_y < 24) {
+                    s16 index = w->monsterGrid[test_candidate_x][test_candidate_y];
+                    if (index != -1) {
+                        Monster monster = w->monsters[index];
+                        if (monster.player != cur->player) {
+                            if (candidate == -1) {
+                                candidate = index;
+                                candidate_path_size = monster.path_size - monster.cur_path_index;
+                            } else {
+                                if (candidate_path_size > monster.path_size - monster.cur_path_index) {
+                                    candidate = index;
+                                    candidate_path_size = monster.path_size - monster.cur_path_index;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (candidate != -1) { // has a target in range
+            if (w->monsters[candidate].screen == SUB_SCREEN) {
+                newProjectile(w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, 5 << 12, SUB_SCREEN, SpriteSize_8x8, SpriteColorFormat_16Color, &w->gfx[SHOT], 2);
+            }
+        }
+
+        cur->timer = 0;
+    }
 }

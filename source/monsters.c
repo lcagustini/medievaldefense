@@ -1,6 +1,6 @@
 void dijkstra(World *world, u16 id);
 
-void updateMonster(Monster s){
+void drawMonster(Monster s){
     oamSet(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, // which display
             s.drawId, // the oam entry to set
             f32toint(s.pos.x), f32toint(s.pos.y), // x & y location
@@ -88,9 +88,73 @@ u8 switchMonsterScreen(World *w, u8 obj) {
 
     deleteMonster(w, obj);
 
-    o.pos.y = 0;
     o.screen = o.screen == MAIN_SCREEN ? SUB_SCREEN : MAIN_SCREEN;
+    o.pos.y = o.screen == SUB_SCREEN ? 0 : inttof32(176);
     return newMonster(w, o);
+}
+
+void updateMonster(World *w, u8 i) {
+    Monster *cur = &w->monsters[i];
+
+    u8 x0 = GRID_XPOS(cur->path[cur->cur_path_index]);
+    u8 y0 = GRID_YPOS(cur->path[cur->cur_path_index]);
+
+    u8 x = GRID_XPOS(cur->path[cur->cur_path_index +1]);
+    u8 y = GRID_YPOS(cur->path[cur->cur_path_index +1]);
+
+    s8 dx = x - x0;
+    s8 dy = y - y0;
+
+    if (dx) {
+        sassert(dx == -1 || dx == 1, "Invalid path");
+        cur->pos.x += mulf32(cur->speed, inttof32(dx));
+    }
+    if (dy) {
+        sassert(dy == -1 || dy == 1, "Invalid path");
+        cur->pos.y += mulf32(cur->speed, inttof32(dy));
+    }
+
+    if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0 &&
+            f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12) == y && f32togrid(cur->pos.x) == x) {
+        cur->cur_path_index++;
+
+        if (w->monsterGrid[x0][y0] == i) w->monsterGrid[x0][y0] = -1;
+        w->monsterGrid[x][y] = i;
+
+        // TESTCODE: currently looping when monster gets to bottom
+        if (cur->cur_path_index >= cur->path_size -1) {
+            deleteMonster(w, i);
+
+#if 0
+            Object o = {0};
+            o.pos.x = inttof32(0);
+            o.pos.y = inttof32(0);
+            o.screen = MAIN_SCREEN;
+            o.size = SpriteSize_16x16;
+            o.color = SpriteColorFormat_16Color;
+            o.speed = 1 << 11;
+            o.gfxData = &troll;
+            o.palId = 1;
+            newObject(w, o);
+#endif
+        }
+
+        if (dy == 1 && y == 12) {
+            switchMonsterScreen(w, i);
+        }
+        if (dy == -1 && y == 11) {
+            switchMonsterScreen(w, i);
+        }
+
+        if (w->needsDijkstra[i]) {
+            dijkstra(w, i);
+            w->needsDijkstra[i] = FALSE;
+        }
+    }
+
+    if (cur->health <= 0) {
+        deleteMonster(w, i);
+    }
 }
 
 void initialize_priority_queue(bin_heap_t *h) {
@@ -192,7 +256,7 @@ void dijkstra(World *world, u16 id) {
         u16 x = GRID_XPOS(next_pos.id);
         u16 y = GRID_YPOS(next_pos.id);
 
-        if (y == 23) {
+        if (y == (obj->player == PLAYER_1 ? 23 : 0)) {
             end = next_pos.id;
             //PRINT("Reached bottom.\n");
             break;

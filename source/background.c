@@ -1,4 +1,4 @@
-void newBackground(World *w, int layer, gfx_t *data, BgType type, BgSize size, int mapBase, int tileBase, Screen screen){
+void newBackground(World *w, u8 layer, gfx_t *data, BgType type, BgSize size, u16 mapBase, u16 tileBase, Screen screen){
     Background b;
 
     b.id = screen == MAIN_SCREEN ? bgInit(layer, type, size, mapBase, tileBase) : bgInitSub(layer, type, size, mapBase, tileBase);
