@@ -7,7 +7,7 @@
 #define FALSE 0
 
 #define PROJECTILE_COUNT 100
-#define MONSTER_COUNT 25
+#define MONSTER_COUNT 50
 #define TOWER_COUNT 50
 
 #define GRID_POS(x, y) (((y) << 4) + (x))
@@ -63,7 +63,7 @@ typedef enum {
 typedef enum {
     PLAYER_1,
     PLAYER_2,
-} Player;
+} Team;
 
 typedef struct {
     u8 drawId;
@@ -76,7 +76,7 @@ typedef struct {
 
     Vector pos;
     Screen screen;
-    Player player;
+    Team player;
     u8 range;
     u8 timer;
 } Tower;
@@ -92,7 +92,7 @@ typedef struct {
 
     Vector pos;
     Screen screen;
-    Player player;
+    Team player;
     s8 health;
     s32 speed;
 
@@ -100,6 +100,11 @@ typedef struct {
     u16 cur_path_index;
     u16 path_size;
 } Monster;
+
+typedef struct {
+    u16 money;
+    u8 health;
+} Player;
 
 typedef struct {
     u8 drawId;
@@ -112,7 +117,7 @@ typedef struct {
 
     Vector pos;
     Screen screen;
-    Player player;
+    Team player;
     s32 speed;
 
     Vector dir;
@@ -142,6 +147,8 @@ typedef struct {
 
     Projectile projectiles[PROJECTILE_COUNT];
     u8 projectileNumber;
+
+    Player players[2];
 
     u8 random;
 

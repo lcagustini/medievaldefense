@@ -123,6 +123,7 @@ void updateMonster(World *w, u8 i) {
 
         // TESTCODE: currently looping when monster gets to bottom
         if (cur->cur_path_index >= cur->path_size -1) {
+            w->players[!cur->player].health--;
             deleteMonster(w, i);
 
 #if 0
@@ -153,6 +154,7 @@ void updateMonster(World *w, u8 i) {
     }
 
     if (cur->health <= 0) {
+        w->players[!cur->player].money++;
         deleteMonster(w, i);
     }
 }
