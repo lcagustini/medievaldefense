@@ -27,7 +27,8 @@
 #define MAP_LEN(a) a##MapLen
 
 #define CREATE_OBJECT_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a)};
-#define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a), MAP(a), MAP_LEN(a)};
+#define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), backgroundPal_sPal, backgroundPal_sPalLen, MAP(a), MAP_LEN(a)};
+//#define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a), MAP(a), MAP_LEN(a)};
 
 typedef struct {
     u16 id;

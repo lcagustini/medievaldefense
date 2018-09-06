@@ -1,0 +1,10 @@
+-m
+-gt
+-gB8
+-pn256
+-gTFF00FF
+-mLs
+-mR8
+-pS
+-O backgroundPal.h
+-S backgroundPal.s

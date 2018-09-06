@@ -10,7 +10,7 @@ void newBackground(World *w, u8 layer, gfx_t *data, BgType type, BgSize size, u1
     //DC_FlushAll();
     dmaCopyHalfWordsAsynch(0, b.data->tiles, bgGetGfxPtr(b.id), b.data->tilesLen);
     dmaCopyHalfWordsAsynch(1, b.data->map, bgGetMapPtr(b.id), b.data->mapLen);
-    dmaCopyHalfWordsAsynch(2, b.data->pal, screen == MAIN_SCREEN ? VRAM_E_EXT_PALETTE[layer] : VRAM_H_EXT_PALETTE[layer], b.data->palLen);
+    dmaCopyHalfWordsAsynch(2, b.data->pal, screen == MAIN_SCREEN ? BG_PALETTE : BG_PALETTE_SUB, b.data->palLen);
 }
 
 void startBgDraw(){

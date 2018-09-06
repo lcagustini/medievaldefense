@@ -27,7 +27,7 @@ BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	
 INCLUDES	:=	include
-GRAPHICS	:=	gfx
+GRAPHICS	:=	#gfx
 AUDIO		:=	audio
 SOUNDBANK_NAME  :=	soundbank
 #---------------------------------------------------------------------------------
@@ -67,7 +67,8 @@ GAME_ICON		:=	$(CURDIR)/../icon.bmp
 #---------------------------------------------------------------------------------
 %.elf:
 	@echo linking $(notdir $@)
-	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
+	@echo $(shell pwd)
+	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) -L../libs $(LIBS) -o $@
 
 
 
@@ -87,11 +88,12 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
+GFXLIBS	?= libgfx.a
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lmm9 -lnds9 -lm
+LIBS	:= -lmm9 -lnds9 -lm -lgfx
  
  
 #---------------------------------------------------------------------------------
@@ -157,6 +159,7 @@ export LIBPATHS		:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 #---------------------------------------------------------------------------------
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
+	@make --no-print-directory -f $(CURDIR)/gfxmake
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
  
 #---------------------------------------------------------------------------------
@@ -173,7 +176,7 @@ else
 #---------------------------------------------------------------------------------
 $(OUTPUT).nds	: 	$(OUTPUT).arm9
 $(OUTPUT).arm9	:	$(OUTPUT).elf
-$(OUTPUT).elf	:	$(OFILES)
+$(OUTPUT).elf	:	$(OFILES) $(GFXLIBS)
 
 
 #---------------------------------------------------------------------------------
