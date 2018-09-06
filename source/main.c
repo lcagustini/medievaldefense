@@ -7,13 +7,9 @@
 #include "towers.c"
 #include "background.c"
 
-//#include <backgroundPal.h>
-//#include <teste.h>
-//#include <tower.h>
-//#include <troll.h>
-//#include <shot.h>
-//#include <hud.h>
 #include <all_gfx.h>
+
+#include "maps.h"
 
 void updateScreens(World *w){
     oamClear(&oamMain, 0, 0);
@@ -84,6 +80,13 @@ int main(void){
     newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 3, 0, SUB_SCREEN);
 
     newBackground(&w, 0, &w.gfx[HUD], BgType_Text8bpp, BgSize_T_256x256, 2, 1, SUB_SCREEN);
+
+    customMap[0] = 0x0001;
+    customMap[32] = 0x000C;
+
+    customMap[1] = 0x0002;
+    customMap[33] = 0x000D;
+    dmaCopyHalfWordsAsynch(1, customMap, bgGetMapPtr(w.bgs[0].id), customMapLen);
 
     timerStart(0, ClockDivider_1024, 0, NULL);
 
