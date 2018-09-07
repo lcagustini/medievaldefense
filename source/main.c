@@ -51,46 +51,46 @@ void setUpScreens(){
 
 void drawHUD(World *w, u16 money, u8 health) {
     //Coin
-    customMap[0] = 0x0001;
-    customMap[32] = 0x000C;
+    infoMap[0] = 0x0001;
+    infoMap[32] = 0x000C;
 
     //Money number
     u16 first = money / 1000;
-    customMap[1] = 0x0002 + first;
-    customMap[33] = 0x000D + first;
+    infoMap[1] = 0x0002 + first;
+    infoMap[33] = 0x000D + first;
 
     u16 second = (money % 1000) / 100;
-    customMap[2] = 0x0002 + second;
-    customMap[34] = 0x000D + second;
+    infoMap[2] = 0x0002 + second;
+    infoMap[34] = 0x000D + second;
 
     u16 third = (money % 100) / 10;
-    customMap[3] = 0x0002 + third;
-    customMap[35] = 0x000D + third;
+    infoMap[3] = 0x0002 + third;
+    infoMap[35] = 0x000D + third;
 
     u16 fourth = money % 10;
-    customMap[4] = 0x0002 + fourth;
-    customMap[36] = 0x000D + fourth;
+    infoMap[4] = 0x0002 + fourth;
+    infoMap[36] = 0x000D + fourth;
 
     //Hearth
-    customMap[27] = 0x0017;
-    customMap[28] = 0x0018;
-    customMap[59] = 0x0019;
-    customMap[60] = 0x001A;
+    infoMap[27] = 0x0017;
+    infoMap[28] = 0x0018;
+    infoMap[59] = 0x0019;
+    infoMap[60] = 0x001A;
 
     //Health number
     first = health / 100;
-    customMap[29] = 0x0002 + first;
-    customMap[61] = 0x000D + first;
+    infoMap[29] = 0x0002 + first;
+    infoMap[61] = 0x000D + first;
 
     second = (health % 100) / 10;
-    customMap[30] = 0x0002 + second;
-    customMap[62] = 0x000D + second;
+    infoMap[30] = 0x0002 + second;
+    infoMap[62] = 0x000D + second;
 
     third = health % 10;
-    customMap[31] = 0x0002 + third;
-    customMap[63] = 0x000D + third;
+    infoMap[31] = 0x0002 + third;
+    infoMap[63] = 0x000D + third;
 
-    dmaCopyHalfWordsAsynch(1, customMap, bgGetMapPtr(w->bgs[0].id), customMapLen);
+    dmaCopyHalfWordsAsynch(3, infoMap, bgGetMapPtr(w->bgs[SUB_SCREEN][0].id), infoMapLen);
 }
 
 int main(void){
@@ -108,6 +108,7 @@ int main(void){
     {
         CREATE_BG_GFX(teste);
         CREATE_BG_GFX(hud);
+        CREATE_BG_GFX(hud_bar);
 
         CREATE_OBJECT_GFX(tower);
         CREATE_OBJECT_GFX(troll);
@@ -118,12 +119,16 @@ int main(void){
         w.gfx[TROLL] = troll;
         w.gfx[SHOT] = shot;
         w.gfx[HUD] = hud;
+        w.gfx[HUD_BAR] = hud_bar;
     }
 
-    newBackground(&w, 1, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 1, 0, MAIN_SCREEN, true);
+    newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 3, 0, MAIN_SCREEN, true);
     newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 3, 0, SUB_SCREEN, true);
 
-    newBackground(&w, 0, &w.gfx[HUD], BgType_Text8bpp, BgSize_T_256x256, 2, 1, SUB_SCREEN, false);
+    newBackground(&w, 1, &w.gfx[HUD_BAR], BgType_Text8bpp, BgSize_T_256x256, 2, 2, MAIN_SCREEN, true);
+    newBackground(&w, 1, &w.gfx[HUD_BAR], BgType_Text8bpp, BgSize_T_256x256, 2, 2, SUB_SCREEN, true);
+
+    newBackground(&w, 0, &w.gfx[HUD], BgType_Text8bpp, BgSize_T_256x256, 1, 1, SUB_SCREEN, false);
 
     {
         w.players[PLAYER_1].money = 10;

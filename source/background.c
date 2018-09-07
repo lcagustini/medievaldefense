@@ -5,7 +5,7 @@ void newBackground(World *w, u8 layer, gfx_t *data, BgType type, BgSize size, u1
     bgSetPriority(b.id, layer);
     b.data = data;
 
-    w->bgs[layer] = b;
+    w->bgs[screen][layer] = b;
 
     //DC_FlushAll();
     dmaCopyHalfWordsAsynch(0, b.data->tiles, bgGetGfxPtr(b.id), b.data->tilesLen);

@@ -46,7 +46,7 @@ export BACKGROUNDS	?= $(notdir $(wildcard gfx/backgrounds/*.png))
 
 # Key exception variables
 export GFXSPECIALS  := $(BACKGROUNDS)
-OSPECIALS		   := backgroundPal.o hud.o teste.o
+OSPECIALS		   := backgroundPal.o hud.o teste.o hud_bar.o
 
 # ---------------------------------------------------------------------
 # BUILD FLAGS
@@ -158,7 +158,7 @@ $(GFXHDR) : $(OFILES)
 # (4) SPECIAL RULES 
 # ---------------------------------------------------------------------
 
-backgroundPal.s backgroundPal.h hud.s hud.h teste.s teste.h : backgrounds.grit $(BACKGROUNDS)
+backgroundPal.s backgroundPal.h hud.s hud.h teste.s teste.h hud_bar.s hud_bar.h : backgrounds.grit $(BACKGROUNDS)
 	@echo $(notdir $^)
 	$(GRIT) $(sort $(filter %.png,$^)) -ff $<
 

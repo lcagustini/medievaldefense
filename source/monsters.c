@@ -4,7 +4,7 @@ void drawMonster(Monster s){
     oamSet(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, // which display
             s.drawId, // the oam entry to set
             f32toint(s.pos.x), f32toint(s.pos.y), // x & y location
-            1, // priority
+            2, // priority
             s.palId, // palette for 16 color sprite or alpha for bmp sprite
             s.size, // size
             s.color, // color type

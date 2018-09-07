@@ -1,2 +1,2 @@
-#define customMapLen 128
-extern unsigned short customMap[64];
+#define infoMapLen 128
+extern unsigned short infoMap[64];

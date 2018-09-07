@@ -135,6 +135,7 @@ typedef enum {
     TROLL,
     SHOT,
     HUD,
+    HUD_BAR,
 } Graphics;
 
 typedef struct {
@@ -155,7 +156,7 @@ typedef struct {
     gfx_t gfx[10];
     u8 freeDrawId[2][128];
 
-    Background bgs[4];
+    Background bgs[2][4];
 
     s16 monsterGrid[16][24];
     s16 towerGrid[16][24];
