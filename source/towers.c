@@ -40,7 +40,7 @@ void deleteTower(World *w, u8 id) {
             if (w->towerGrid[i][j] == id) {
                 w->towerGrid[i][j] = -1;
             }
-            else if (w->towerGrid[i][j] > id) {
+            else if (w->towerGrid[i][j] > id && w->towerGrid[i][j] != 255) {
                 w->towerGrid[i][j]--;
             }
         }
@@ -89,7 +89,7 @@ void updateTower(World *w, u8 i) {
             for (int k = -cur->range; k <= cur->range; k++) {
                 s8 test_candidate_x = grid_x + j;
                 s8 test_candidate_y = grid_y + k;
-                if (test_candidate_x >= 0 && test_candidate_y >= 12 && test_candidate_x < 16 && test_candidate_y < 24) {
+                if (test_candidate_x >= 0 && test_candidate_y >= 0 && test_candidate_x < 16 && test_candidate_y < 24) {
                     s16 index = w->monsterGrid[test_candidate_x][test_candidate_y];
                     if (index != -1) {
                         Monster monster = w->monsters[index];
@@ -109,8 +109,8 @@ void updateTower(World *w, u8 i) {
             }
         }
         if (candidate != -1) { // has a target in range
-            if (w->monsters[candidate].screen == SUB_SCREEN) {
-                newProjectile(w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, 5 << 12, SUB_SCREEN, SpriteSize_8x8, SpriteColorFormat_16Color, &w->gfx[SHOT], 2);
+            if (w->monsters[candidate].screen == cur->screen) {
+                newProjectile(w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, 5 << 12, cur->screen, SpriteSize_8x8, SpriteColorFormat_16Color, &w->gfx[SHOT], 2);
             }
         }
 

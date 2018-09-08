@@ -14,8 +14,12 @@ void freeDrawId(World *w, Screen screen, u8 id) {
 }
 
 u8 getRandomNumber(World *w) {
-    w->random ^= w->random << 7;
-    w->random ^= w->random >> 5;
-    w->random ^= w->random << 3;
-    return w->random;
+    u8 t = w->random[0] ^ (w->random[0] << 4);
+
+    w->random[0] = w->random[1];
+    w->random[1] = w->random[2];
+    w->random[2] = w->random[3];
+    w->random[3] = w->random[3] ^ t ^ (w->random[3] >> 1) ^ (t << 1);
+
+    return w->random[3];
 }

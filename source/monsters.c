@@ -1,4 +1,4 @@
-void dijkstra(World *world, u16 id);
+u8 dijkstra(World *world, u16 id, u8 testing);
 
 void drawMonster(Monster s){
     oamSet(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, // which display
@@ -76,7 +76,7 @@ u8 newMonster(World *w, Monster s){
     }
 
     w->monsters[w->monsterNumber].path = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(u16));
-    dijkstra(w, w->monsterNumber);
+    dijkstra(w, w->monsterNumber, FALSE);
 
     w->monsterNumber++;
 
@@ -121,40 +121,28 @@ void updateMonster(World *w, u8 i) {
         if (w->monsterGrid[x0][y0] == i) w->monsterGrid[x0][y0] = -1;
         w->monsterGrid[x][y] = i;
 
-        // TESTCODE: currently looping when monster gets to bottom
         if (cur->cur_path_index >= cur->path_size -1) {
             w->players[!cur->player].health--;
-            deleteMonster(w, i);
+            w->players[!cur->player].money++;
+            w->players[cur->player].money += 2;
 
-#if 0
-            Object o = {0};
-            o.pos.x = inttof32(0);
-            o.pos.y = inttof32(0);
-            o.screen = MAIN_SCREEN;
-            o.size = SpriteSize_16x16;
-            o.color = SpriteColorFormat_16Color;
-            o.speed = 1 << 11;
-            o.gfxData = &troll;
-            o.palId = 1;
-            newObject(w, o);
-#endif
+            deleteMonster(w, i);
         }
 
         if (dy == 1 && y == 12) {
             switchMonsterScreen(w, i);
         }
-        if (dy == -1 && y == 11) {
+        else if (dy == -1 && y == 11) {
             switchMonsterScreen(w, i);
         }
-
-        if (w->needsDijkstra[i]) {
-            dijkstra(w, i);
+        else if (w->needsDijkstra[i]) {
+            dijkstra(w, i, FALSE);
             w->needsDijkstra[i] = FALSE;
         }
     }
 
     if (cur->health <= 0) {
-        w->players[!cur->player].money += 2;
+        w->players[!cur->player].money += 3;
         deleteMonster(w, i);
     }
 }
@@ -218,14 +206,20 @@ bin_heap_elem_t pop_priority_queue(bin_heap_t *h) {
     return result;
 }
 
-void dijkstra(World *world, u16 id) {
+u8 dijkstra(World *world, u16 id, u8 testing) {
     Monster *obj = &world->monsters[id];
 
     bin_heap_t queue;
     queue.data = malloc(MAX_PATH_BIN_HEAP_SIZE * sizeof(*queue.data));
     initialize_priority_queue(&queue);
 
-    u16 starting_pos = GRID_POS(f32togrid(obj->pos.x), obj->screen == MAIN_SCREEN ? f32togrid(obj->pos.y) : f32togrid(obj->pos.y) + 12);
+    u16 starting_pos;
+    if (testing) {
+        starting_pos = 0;
+    }
+    else {
+        starting_pos = GRID_POS(f32togrid(obj->pos.x), obj->screen == MAIN_SCREEN ? f32togrid(obj->pos.y) : f32togrid(obj->pos.y) + 12);
+    }
 
     bin_heap_elem_t start = {starting_pos, 0};
     insert_priority_queue(&queue, start);
@@ -258,7 +252,7 @@ void dijkstra(World *world, u16 id) {
         u16 x = GRID_XPOS(next_pos.id);
         u16 y = GRID_YPOS(next_pos.id);
 
-        if (y == (obj->player == PLAYER_1 ? 23 : 0)) {
+        if (y == (testing ? 23 : (obj->player == PLAYER_1 ? 23 : 0))) {
             end = next_pos.id;
             //PRINT("Reached bottom.\n");
             break;
@@ -322,25 +316,27 @@ void dijkstra(World *world, u16 id) {
 #endif
     }
 
-    obj->cur_path_index = 0;
+    if (!testing) {
+        obj->cur_path_index = 0;
 
-    u16 pos = end;
-    {
-        u16 i = 0;
-        while (pos != starting_pos) {
-            obj->path[i++] = pos;
-            pos = predecessor[pos];
+        u16 pos = end;
+        {
+            u16 i = 0;
+            while (pos != starting_pos) {
+                obj->path[i++] = pos;
+                pos = predecessor[pos];
+            }
+            obj->path[i++] = starting_pos;
+            obj->path_size = i;
         }
-        obj->path[i++] = starting_pos;
-        obj->path_size = i;
-    }
 
-    // reverse
-    {
-        for (u16 i = 0; i < obj->path_size / 2; i++) {
-            u16 aux = obj->path[i];
-            obj->path[i] = obj->path[obj->path_size - i - 1];
-            obj->path[obj->path_size - i - 1] = aux;
+        // reverse
+        {
+            for (u16 i = 0; i < obj->path_size / 2; i++) {
+                u16 aux = obj->path[i];
+                obj->path[i] = obj->path[obj->path_size - i - 1];
+                obj->path[obj->path_size - i - 1] = aux;
+            }
         }
     }
 
@@ -355,5 +351,7 @@ void dijkstra(World *world, u16 id) {
     free(queue.data);
     free(visited);
     free(predecessor);
+
+    return end != 10000;
 }
 

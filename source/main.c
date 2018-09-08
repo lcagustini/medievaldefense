@@ -6,8 +6,10 @@
 #include "monsters.c"
 #include "towers.c"
 #include "background.c"
+#include "input.c"
 
 #include <all_gfx.h>
+#include <time.h>
 
 void updateScreens(World *w){
     oamClear(&oamMain, 0, 0);
@@ -55,9 +57,30 @@ int main(void){
     setUpScreens();
 
     World w = {0};
-    memset(&w.towerGrid, -1, 2*16*24);
-    memset(&w.monsterGrid, -1, 2*16*24);
-    w.random = 128;
+    {
+        w.random[3] = time(NULL);
+        //memset(&w.towerGrid, -1, 2*16*24);
+        memset(&w.monsterGrid, -1, 2*16*24);
+
+        s16 map[16][24] = {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+                           {-1, -1, -1, -1, -1, 255, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 255, -1, -1, -1, -1, -1, -1},
+                           {-1, -1, -1, 255, 255, 255, 255, -1, -1, -1, -1, -1, -1, -1, -1, 255, 255, 255, 255, -1, -1, -1, -1, -1},
+                           {-1, -1, -1, 255, 255, 255, 255, 255, -1, -1, -1, -1, -1, -1, -1, 255, 255, 255, 255, 255, -1, -1, -1, -1},
+                           {-1, -1, -1, 255, 255, 255, 255, 255, 255, -1, -1, -1, -1, -1, -1, 255, 255, 255, 255, 255, 255, -1, -1, -1},
+                           {-1, -1, -1, -1, 255, 255, 255, 255, -1, -1, -1, -1, -1, -1, -1, -1, 255, 255, 255, 255, -1, -1, -1, -1},
+                           {-1, -1, -1, -1, -1, 255, 255, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 255, 255, -1, -1, -1, -1, -1},
+                           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+                           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+                           {-1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1, -1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1},
+                           {-1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1, -1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1},
+                           {-1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1, -1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1},
+                           {-1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1, -1, -1, 255, 255, 255, 255, 255, 255, 255, 255, -1, -1},
+                           {-1, -1, 255, 255, 255, 255, 255, 255, 255, -1, -1, -1, -1, -1, 255, 255, 255, 255, 255, 255, 255, -1, -1, -1},
+                           {-1, -1, -1, -1, -1, 255, 255, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 255, 255, -1, -1, -1, -1, -1},
+                           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
+
+        memcpy(&w.towerGrid, &map, 2*16*24);
+    }
 
     {
         CREATE_BG_GFX(teste);
@@ -76,13 +99,15 @@ int main(void){
         w.gfx[HUD_BAR] = hud_bar;
     }
 
-    newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 3, 0, MAIN_SCREEN, true);
-    newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 3, 0, SUB_SCREEN, true);
+    {
+        newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 0, 1, MAIN_SCREEN, true);
+        newBackground(&w, 2, &w.gfx[GRASS], BgType_Text8bpp, BgSize_T_256x256, 0, 1, SUB_SCREEN, true);
 
-    newBackground(&w, 1, &w.gfx[HUD_BAR], BgType_Text8bpp, BgSize_T_256x256, 2, 2, MAIN_SCREEN, true);
-    newBackground(&w, 1, &w.gfx[HUD_BAR], BgType_Text8bpp, BgSize_T_256x256, 2, 2, SUB_SCREEN, true);
+        newBackground(&w, 1, &w.gfx[HUD_BAR], BgType_Text8bpp, BgSize_T_256x256, 1, 3, MAIN_SCREEN, true);
+        newBackground(&w, 1, &w.gfx[HUD_BAR], BgType_Text8bpp, BgSize_T_256x256, 1, 3, SUB_SCREEN, true);
 
-    newBackground(&w, 0, &w.gfx[HUD], BgType_Text8bpp, BgSize_T_256x256, 1, 1, SUB_SCREEN, false);
+        newBackground(&w, 0, &w.gfx[HUD], BgType_Text8bpp, BgSize_T_256x256, 2, 4, SUB_SCREEN, false);
+    }
 
     {
         w.players[PLAYER_1].money = 10;
@@ -113,32 +138,10 @@ int main(void){
 
         if (t.px != 0 && t.py != 0) {
             if (!pressed) {
-                u8 x = (t.px >> 4) << 4;
-                u8 y = (t.py >> 4) << 4;
+                u8 x = t.px >> 4;
+                u8 y = t.py >> 4;
 
-                if (y != 0 && (y >> 4) != 11 && w.towerGrid[x >> 4][(y >> 4) + 12] == -1) {
-                    if (w.players[PLAYER_2].money) {
-                        w.players[PLAYER_2].money--;
-
-                        Tower o = {0};
-                        o.size = SpriteSize_16x16;
-                        o.color = SpriteColorFormat_16Color;
-                        o.palId = 0;
-
-                        o.gfxData = &w.gfx[TOWER];
-
-                        o.pos.x = inttof32(x);
-                        o.pos.y = inttof32(y);
-                        o.screen = SUB_SCREEN;
-                        o.player = PLAYER_2;
-                        o.range = 2;
-                        newTower(&w, o);
-
-                        for (int i = 0; i < w.monsterNumber; i++) {
-                            w.needsDijkstra[i] = TRUE;
-                        }
-                    }
-                }
+                buyTower(&w, x, y, PLAYER_2);
             }
             pressed = TRUE;
         }
@@ -148,42 +151,12 @@ int main(void){
 
         if (pressedKeys) {
             if (pressedKeys & KEY_A) {
-                Monster o = {0};
-                o.size = SpriteSize_16x16;
-                o.color = SpriteColorFormat_16Color;
-                o.palId = 1;
-
-                o.gfxData = &w.gfx[TROLL];
-
-                o.pos.x = inttof32((getRandomNumber(&w) % 16) << 4);
-                o.pos.y = inttof32(0);
-                o.screen = MAIN_SCREEN;
-                o.player = PLAYER_1;
-                o.health = 5;
-                o.speed = 1 << 11;
-                newMonster(&w, o);
+                buyMonster(&w, PLAYER_2);
             }
+        }
 
-            if (pressedKeys & KEY_B) {
-                if (w.players[PLAYER_2].money) {
-                    w.players[PLAYER_2].money--;
-
-                    Monster o = {0};
-                    o.size = SpriteSize_16x16;
-                    o.color = SpriteColorFormat_16Color;
-                    o.palId = 1;
-
-                    o.gfxData = &w.gfx[TROLL];
-
-                    o.pos.x = inttof32((getRandomNumber(&w) % 16) << 4);
-                    o.pos.y = inttof32(176);
-                    o.screen = SUB_SCREEN;
-                    o.player = PLAYER_2;
-                    o.health = 5;
-                    o.speed = 1 << 11;
-                    newMonster(&w, o);
-                }
-            }
+        if (!w.players[PLAYER_1].health || !w.players[PLAYER_2].health) {
+            PRINT("Game Over\n");
         }
 
         drawHUD(&w, w.players[PLAYER_2].money, w.players[PLAYER_2].health);
@@ -192,8 +165,26 @@ int main(void){
             for(int i = 0; i < w.towerNumber; i++){
                 w.towers[i].timer++;
             }
+
+            if (getRandomNumber(&w) > 250) {
+                buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
+            }
+            if (getRandomNumber(&w) > 250) {
+                buyMonster(&w, PLAYER_1);
+            }
+
             ticker = 0;
         }
+
+#if 0
+        for (int i = 0; i < 16; i++) {
+            for(int j = 0; j < 24; j++) {
+                PRINT("%2d ", w.towerGrid[i][j]);
+            }
+            PRINT("\n");
+        }
+        PRINT("\n");
+#endif
 
         bgUpdate();
         updateScreens(&w);

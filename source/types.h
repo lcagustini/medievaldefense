@@ -151,7 +151,7 @@ typedef struct {
 
     Player players[2];
 
-    u8 random;
+    u8 random[4];
 
     gfx_t gfx[10];
     u8 freeDrawId[2][128];
