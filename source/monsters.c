@@ -128,8 +128,7 @@ void updateMonster(World *w, u8 i) {
 
             deleteMonster(w, i);
         }
-
-        if (dy == 1 && y == 12) {
+        else if (dy == 1 && y == 12) {
             switchMonsterScreen(w, i);
         }
         else if (dy == -1 && y == 11) {
