@@ -3,8 +3,8 @@
 -gB8
 -pn256
 -gTFF00FF
--mLf
--mR8
+-mLa
+-mRa
 -pS
 -O backgroundPal.h
 -S backgroundPal.s
