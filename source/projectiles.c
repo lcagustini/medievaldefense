@@ -74,17 +74,22 @@ void updateProjectile(World *w, u8 i) {
     cur->pos.y += mulf32(cur->speed, cur->dir.y);
     cur->pos.x += mulf32(cur->speed, cur->dir.x);
 
-    s16 index = w->monsterGrid[f32togrid(cur->pos.x)][f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12)];
     if (f32toint(cur->pos.y) < 0 ||
             f32toint(cur->pos.x) < 0 ||
             f32toint(cur->pos.y) > 192 ||
             f32toint(cur->pos.x) > 256) {
         deleteProjectile(w, i);
     }
-    else if (index != -1) {
-        if (cur->player != w->monsters[index].player) {
-            w->monsters[index].health--;
-            deleteProjectile(w, i);
+    else {
+        for (int j = 0; j < w->monsterNumber; j++) {
+            if (f32togrid(cur->pos.x) == f32togrid(w->monsters[j].pos.x) &&
+                    f32togrid(cur->pos.y) == f32togrid(w->monsters[j].pos.y)) {
+                if (cur->player != w->monsters[j].player) {
+                    w->monsters[j].health--;
+                    deleteProjectile(w, i);
+                    break;
+                }
+            }
         }
     }
 }

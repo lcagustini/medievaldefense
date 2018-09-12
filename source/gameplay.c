@@ -137,7 +137,7 @@ Gamestate runGame() {
                 w.towers[i].timer++;
             }
 
-            if (getRandomNumber(&w) > 250) {
+            if (getRandomNumber(&w) > 252) {
                 buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
             }
             if (getRandomNumber(&w) > 250) {
