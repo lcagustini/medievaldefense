@@ -18,6 +18,8 @@
 
 #define PRINT(...) fprintf(stderr, __VA_ARGS__)
 #define f32togrid(a) ((f32toint(a)) >> (4))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 #define TILES(a) a##Tiles
 #define TILES_LEN(a) a##TilesLen
@@ -84,6 +86,7 @@ typedef struct {
 typedef enum {
     TANK,
     SCOUT,
+    KAMIKAZE,
 } MonsterTypes;
 
 typedef struct {
@@ -101,6 +104,7 @@ typedef struct {
     s8 health;
     s32 speed;
 
+    MonsterTypes type;
     u8 cost;
     u8 reward;
 
@@ -139,12 +143,17 @@ typedef struct {
 
 typedef enum {
     GRASS,
+
     TOWER,
+    SHOT,
+
     TROLL_RED,
     TROLL_BLUE,
-    SHOT,
+    TROLL_BLACK,
+
     HUD,
     HUD_BAR,
+
     TOP_TITLE,
     BOTTOM_TITLE,
 } Graphics;

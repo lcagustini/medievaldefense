@@ -53,12 +53,14 @@ Gamestate runGame() {
         CREATE_OBJECT_GFX(tower);
         CREATE_OBJECT_GFX(troll);
         CREATE_OBJECT_GFX(troll_blue);
+        CREATE_OBJECT_GFX(troll_black);
         CREATE_OBJECT_GFX(shot);
 
         w.gfx[GRASS] = teste;
         w.gfx[TOWER] = tower;
         w.gfx[TROLL_RED] = troll;
         w.gfx[TROLL_BLUE] = troll_blue;
+        w.gfx[TROLL_BLACK] = troll_black;
         w.gfx[SHOT] = shot;
         w.gfx[HUD] = hud;
         w.gfx[HUD_BAR] = hud_bar;
@@ -123,6 +125,9 @@ Gamestate runGame() {
             if (pressedKeys & KEY_B) {
                 buyMonster(&w, PLAYER_2, SCOUT);
             }
+            if (pressedKeys & KEY_X) {
+                buyMonster(&w, PLAYER_2, KAMIKAZE);
+            }
         }
 
         if (!w.players[PLAYER_1].health || !w.players[PLAYER_2].health) {
@@ -141,12 +146,20 @@ Gamestate runGame() {
                 buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
             }
             if (getRandomNumber(&w) > 250) {
-                if (getRandomNumber(&w) > 127) {
+#if 0
+                u8 rand = getRandomNumber(&w);
+                if (rand < 86) {
                     buyMonster(&w, PLAYER_1, TANK);
                 }
-                else {
+                else if (rand < 171){
                     buyMonster(&w, PLAYER_1, SCOUT);
                 }
+                else {
+#endif
+                    buyMonster(&w, PLAYER_1, KAMIKAZE);
+#if 0
+                }
+#endif
             }
 
             ticker = 0;

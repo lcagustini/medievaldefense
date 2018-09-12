@@ -6,8 +6,8 @@
 
 #include "world.c"
 #include "projectiles.c"
-#include "monsters.c"
 #include "towers.c"
+#include "monsters.c"
 #include "background.c"
 #include "input.c"
 

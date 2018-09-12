@@ -142,6 +142,17 @@ void updateMonster(World *w, u8 i) {
 
     if (cur->health <= 0) {
         w->players[!cur->player].money += cur->reward;
+
+        if (cur->type == KAMIKAZE) {
+            for (int j = 0; j < w->towerNumber; j++) {
+                if ((MAX(abs(f32togrid(w->towers[j].pos.x) - f32togrid(cur->pos.x)), abs(f32togrid(w->towers[j].pos.y) - f32togrid(cur->pos.y)))) <= 1) {
+                    PRINT("BOOM\n");
+                    deleteTower(w, j);
+                    j--;
+                }
+            }
+        }
+
         deleteMonster(w, i);
     }
 }

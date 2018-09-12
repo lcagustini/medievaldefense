@@ -36,19 +36,20 @@ void buyMonster(World *w, Team team, MonsterTypes type) {
     Monster o = {0};
     o.size = SpriteSize_16x16;
     o.color = SpriteColorFormat_16Color;
-    o.palId = type == TANK ? 1 : 2;
+    o.palId = type == TANK ? 1 : (type == SCOUT ? 2 : 4);
 
-    o.gfxData = type == TANK ? &w->gfx[TROLL_RED] : &w->gfx[TROLL_BLUE];
+    o.gfxData = type == TANK ? &w->gfx[TROLL_RED] : (type == SCOUT ? &w->gfx[TROLL_BLUE] : &w->gfx[TROLL_BLACK]);
 
     o.pos.x = inttof32((getRandomNumber(w) % 16) << 4);
     o.pos.y = inttof32(s == MAIN_SCREEN ? 0 : 176);
     o.screen = s;
     o.player = team;
-    o.health = type == TANK ? 5 : 3;
-    o.speed = type == TANK ? 1 << 11 : 3 << 10;
+    o.health = type == TANK ? 5 : (type == SCOUT ? 3 : 1);
+    o.speed = type == TANK ? 1 << 11 : (type == SCOUT ? 3 << 10 : 5 << 9);
 
-    o.cost = 2;
-    o.reward = 3;
+    o.type = type;
+    o.cost = type == KAMIKAZE ? 3 : 2;
+    o.reward = type == KAMIKAZE ? 0 : 3;
 
     if (w->players[team].money >= o.cost) {
         w->players[team].money -= o.cost;
