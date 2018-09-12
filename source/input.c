@@ -15,7 +15,7 @@ void buyTower(World *w, u8 x, u8 y, Team team) {
             o.player = team;
             o.range = 2;
             u8 id = newTower(w, o);
-            
+
             if (dijkstra(w, 0, TRUE)) {
                 w->players[team].money--;
             }
@@ -30,25 +30,29 @@ void buyTower(World *w, u8 x, u8 y, Team team) {
     }
 }
 
-void buyMonster(World *w, Team team) {
+void buyMonster(World *w, Team team, MonsterTypes type) {
     Screen s = team == PLAYER_2 ? SUB_SCREEN : MAIN_SCREEN;
 
-    if (w->players[team].money >= 2) {
-        w->players[team].money -= 2;
+    Monster o = {0};
+    o.size = SpriteSize_16x16;
+    o.color = SpriteColorFormat_16Color;
+    o.palId = type == TANK ? 1 : 2;
 
-        Monster o = {0};
-        o.size = SpriteSize_16x16;
-        o.color = SpriteColorFormat_16Color;
-        o.palId = 1;
+    o.gfxData = type == TANK ? &w->gfx[TROLL_RED] : &w->gfx[TROLL_BLUE];
 
-        o.gfxData = &w->gfx[TROLL];
+    o.pos.x = inttof32((getRandomNumber(w) % 16) << 4);
+    o.pos.y = inttof32(s == MAIN_SCREEN ? 0 : 176);
+    o.screen = s;
+    o.player = team;
+    o.health = type == TANK ? 5 : 3;
+    o.speed = type == TANK ? 1 << 11 : 3 << 10;
 
-        o.pos.x = inttof32((getRandomNumber(w) % 16) << 4);
-        o.pos.y = inttof32(s == MAIN_SCREEN ? 0 : 176);
-        o.screen = s;
-        o.player = team;
-        o.health = 5;
-        o.speed = 1 << 11;
+    o.cost = 2;
+    o.reward = 3;
+
+    if (w->players[team].money >= o.cost) {
+        w->players[team].money -= o.cost;
+
         newMonster(w, o);
     }
 }

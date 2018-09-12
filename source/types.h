@@ -28,7 +28,7 @@
 
 #define CREATE_OBJECT_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a)};
 #define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), backgroundPal_sPal, backgroundPal_sPalLen, MAP(a), MAP_LEN(a)};
-//#define CREATE_BG_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a), MAP(a), MAP_LEN(a)};
+#define CREATE_BG_NS_GFX(a) gfx_t (a) = {TILES(a), TILES_LEN(a), PAL(a), PAL_LEN(a), MAP(a), MAP_LEN(a)};
 
 typedef struct {
     u16 id;
@@ -81,6 +81,11 @@ typedef struct {
     u8 timer;
 } Tower;
 
+typedef enum {
+    TANK,
+    SCOUT,
+} MonsterTypes;
+
 typedef struct {
     u8 drawId;
     SpriteSize size;
@@ -95,6 +100,9 @@ typedef struct {
     Team player;
     s8 health;
     s32 speed;
+
+    u8 cost;
+    u8 reward;
 
     u16 *path;
     u16 cur_path_index;
@@ -132,10 +140,13 @@ typedef struct {
 typedef enum {
     GRASS,
     TOWER,
-    TROLL,
+    TROLL_RED,
+    TROLL_BLUE,
     SHOT,
     HUD,
     HUD_BAR,
+    TOP_TITLE,
+    BOTTOM_TITLE,
 } Graphics;
 
 typedef struct {
@@ -149,15 +160,24 @@ typedef struct {
     Projectile projectiles[PROJECTILE_COUNT];
     u8 projectileNumber;
 
+    //Access with enum Player
     Player players[2];
 
     u8 random[4];
 
+    //Access with enum Graphics
     gfx_t gfx[10];
+    //Access with enum Screen
     u8 freeDrawId[2][128];
 
+    //Access with enum Screen
     Background bgs[2][4];
 
     s16 monsterGrid[16][24];
     s16 towerGrid[16][24];
 } World;
+
+typedef enum {
+    TITLE_SCREEN,
+    GAMEPLAY,
+} Gamestate;

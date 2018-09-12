@@ -141,7 +141,7 @@ void updateMonster(World *w, u8 i) {
     }
 
     if (cur->health <= 0) {
-        w->players[!cur->player].money += 3;
+        w->players[!cur->player].money += cur->reward;
         deleteMonster(w, i);
     }
 }
