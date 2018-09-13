@@ -80,7 +80,7 @@ u8 newTower(World *w, Tower s){
 void updateTower(World *w, u8 i) {
     Tower *cur = &w->towers[i];
 
-    if (cur->timer == 10) {
+    if (cur->timer == 20) {
         s16 candidate = -1;
         u8 candidate_path_size = 255;
         u8 grid_x = f32togrid(cur->pos.x);
