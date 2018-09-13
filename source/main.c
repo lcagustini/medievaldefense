@@ -28,8 +28,8 @@ void setUpScreens(){
     vramSetBankH(VRAM_H_SUB_BG_EXT_PALETTE);
     vramSetBankI(VRAM_I_SUB_SPRITE_EXT_PALETTE);
 
-    oamInit(&oamMain, SpriteMapping_1D_128, true);
-    oamInit(&oamSub, SpriteMapping_1D_128, true);
+    oamInit(&oamMain, SpriteMapping_1D_128, false);
+    oamInit(&oamSub, SpriteMapping_1D_128, false);
 }
 
 int main(void){

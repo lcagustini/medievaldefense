@@ -38,7 +38,7 @@ void buyMonster(World *w, Team team, MonsterTypes type) {
     o.color = SpriteColorFormat_16Color;
     o.palId = type == TANK ? 1 : (type == SCOUT ? 2 : 4);
 
-    o.gfxData = type == TANK ? &w->gfx[TROLL_RED] : (type == SCOUT ? &w->gfx[TROLL_BLUE] : &w->gfx[TROLL_BLACK]);
+    o.gfxData = type == TANK ? &w->gfx[TROLL] : (type == SCOUT ? &w->gfx[WOLF] : &w->gfx[BOMBER]);
 
     o.pos.x = inttof32((getRandomNumber(w) % 16) << 4);
     o.pos.y = inttof32(s == MAIN_SCREEN ? 0 : 176);

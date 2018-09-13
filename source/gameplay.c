@@ -52,15 +52,15 @@ Gamestate runGame() {
 
         CREATE_OBJECT_GFX(tower);
         CREATE_OBJECT_GFX(troll);
-        CREATE_OBJECT_GFX(troll_blue);
-        CREATE_OBJECT_GFX(troll_black);
+        CREATE_OBJECT_GFX(wolf);
+        CREATE_OBJECT_GFX(bomber);
         CREATE_OBJECT_GFX(shot);
 
         w.gfx[GRASS] = teste;
         w.gfx[TOWER] = tower;
-        w.gfx[TROLL_RED] = troll;
-        w.gfx[TROLL_BLUE] = troll_blue;
-        w.gfx[TROLL_BLACK] = troll_black;
+        w.gfx[TROLL] = troll;
+        w.gfx[WOLF] = wolf;
+        w.gfx[BOMBER] = bomber;
         w.gfx[SHOT] = shot;
         w.gfx[HUD] = hud;
         w.gfx[HUD_BAR] = hud_bar;
@@ -77,7 +77,7 @@ Gamestate runGame() {
 
         bgSetCenter(w.bgs[MAIN_SCREEN][3].id, 128, 96);
         bgSetScroll(w.bgs[MAIN_SCREEN][3].id, 127, 96);
-        bgRotate(w.bgs[MAIN_SCREEN][3].id, 16384);
+        bgRotate(w.bgs[MAIN_SCREEN][3].id, degreesToAngle(180));
     }
 
     {
@@ -86,6 +86,17 @@ Gamestate runGame() {
 
         w.players[PLAYER_2].money = 10;
         w.players[PLAYER_2].health = 20;
+    }
+
+    {
+        oamRotateScale(&oamMain, 0, degreesToAngle(90), intToFixed(1, 8), intToFixed(1, 8));
+        oamRotateScale(&oamSub, 0, degreesToAngle(90), intToFixed(1, 8), intToFixed(1, 8));
+
+        oamRotateScale(&oamMain, 1, degreesToAngle(180), intToFixed(1, 8), intToFixed(1, 8));
+        oamRotateScale(&oamSub, 1, degreesToAngle(180), intToFixed(1, 8), intToFixed(1, 8));
+
+        oamRotateScale(&oamMain, 2, degreesToAngle(270), intToFixed(1, 8), intToFixed(1, 8));
+        oamRotateScale(&oamSub, 2, degreesToAngle(270), intToFixed(1, 8), intToFixed(1, 8));
     }
 
     timerStart(0, ClockDivider_1024, 0, NULL);

@@ -89,6 +89,13 @@ typedef enum {
     KAMIKAZE,
 } MonsterTypes;
 
+typedef enum {
+    UP,
+    LEFT,
+    DOWN,
+    RIGHT,
+} Direction;
+
 typedef struct {
     u8 drawId;
     SpriteSize size;
@@ -98,10 +105,12 @@ typedef struct {
     u16* gfxPtr;
     gfx_t *gfxData;
 
-    Vector pos;
     Screen screen;
     Team player;
     s8 health;
+
+    Vector pos;
+    Direction dir;
     s32 speed;
 
     MonsterTypes type;
@@ -147,9 +156,9 @@ typedef enum {
     TOWER,
     SHOT,
 
-    TROLL_RED,
-    TROLL_BLUE,
-    TROLL_BLACK,
+    TROLL,
+    WOLF,
+    BOMBER,
 
     HUD,
     HUD_BAR,

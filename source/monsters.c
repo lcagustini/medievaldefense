@@ -9,8 +9,8 @@ void drawMonster(Monster s){
             s.size, // size
             s.color, // color type
             s.gfxPtr, // the oam gfx
-            -1, //affine index
-            true, //double the size of rotated sprites
+            s.dir - 1, //affine index
+            false, //double the size of rotated sprites
             false, //don't hide the sprite
             false, false, //vflip, hflip
             false //apply mosaic
@@ -108,10 +108,12 @@ void updateMonster(World *w, u8 i) {
     if (dx) {
         sassert(dx == -1 || dx == 1, "Invalid path");
         cur->pos.x += mulf32(cur->speed, inttof32(dx));
+        cur->dir = dx > 0 ? RIGHT : LEFT;
     }
     if (dy) {
         sassert(dy == -1 || dy == 1, "Invalid path");
         cur->pos.y += mulf32(cur->speed, inttof32(dy));
+        cur->dir = dy > 0 ? DOWN : UP;
     }
 
     if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0 &&
