@@ -42,7 +42,7 @@ LIBNDS	:=	$(DEVKITPRO)/libnds
 
 GAME_TITLE	    :=	Medieval Defense
 GAME_SUBTITLE1	:=	Competitive tower defense
-GAME_SUBTITLE2	:=	
+GAME_SUBTITLE2	:=	Multiplayer game
 GAME_ICON		:=	$(CURDIR)/../icon.bmp
 #---------------------------------------------------------------------------------
 %.nds: %.arm9

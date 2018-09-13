@@ -140,12 +140,32 @@ void updateMonster(World *w, u8 i) {
         }
     }
 
+    if (cur->type == KAMIKAZE) {
+        u8 grid_x = f32togrid(cur->pos.x);
+        u8 grid_y = f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12);
+        for (int j = -1; j <= 1; j++) {
+            for (int k = -1; k <= 1; k++) {
+                s8 test_candidate_x = grid_x + j;
+                s8 test_candidate_y = grid_y + k;
+                if (test_candidate_x >= 0 && test_candidate_y >= 0 && test_candidate_x < 16 && test_candidate_y < 24) {
+                    s16 index = w->towerGrid[test_candidate_x][test_candidate_y];
+                    if (index != -1 && index != 255) {
+                        Tower tower = w->towers[index];
+                        if (tower.player != cur->player) {
+                            cur->health = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if (cur->health <= 0) {
         w->players[!cur->player].money += cur->reward;
 
         if (cur->type == KAMIKAZE) {
             for (int j = 0; j < w->towerNumber; j++) {
-                if ((MAX(abs(f32togrid(w->towers[j].pos.x) - f32togrid(cur->pos.x)), abs(f32togrid(w->towers[j].pos.y) - f32togrid(cur->pos.y)))) <= 2) {
+                if ((MAX(abs(f32togrid(w->towers[j].pos.x) - f32togrid(cur->pos.x)), abs(f32togrid(w->towers[j].pos.y) - f32togrid(cur->pos.y)))) <= 1) {
                     deleteTower(w, j);
                     j--;
                 }
@@ -268,9 +288,13 @@ u8 dijkstra(World *world, u16 id, u8 testing) {
         }
 
         u16 pos;
+        u8 test;
 
         pos = GRID_POS(x + 1, y);
-        if (x + 1 < 16 && visited[pos] != 2 && world->towerGrid[x+1][y] == -1) {
+        test = obj->type == KAMIKAZE ?
+            (world->towerGrid[x+1][y] == -1 || (world->towerGrid[x+1][y] != 255 && world->towers[world->towerGrid[x+1][y]].player != obj->player)) :
+            (world->towerGrid[x+1][y] == -1);
+        if (x + 1 < 16 && visited[pos] != 2 && test) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
@@ -281,7 +305,10 @@ u8 dijkstra(World *world, u16 id, u8 testing) {
         }
 
         pos = GRID_POS(x - 1, y);
-        if (x - 1 >= 0 && visited[pos] != 2 && world->towerGrid[x-1][y] == -1) {
+        test = obj->type == KAMIKAZE ?
+            (world->towerGrid[x-1][y] == -1 || (world->towerGrid[x-1][y] != 255 && world->towers[world->towerGrid[x-1][y]].player != obj->player)) :
+            (world->towerGrid[x-1][y] == -1);
+        if (x - 1 >= 0 && visited[pos] != 2 && test) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
@@ -292,7 +319,10 @@ u8 dijkstra(World *world, u16 id, u8 testing) {
         }
 
         pos = GRID_POS(x, y + 1);
-        if (y + 1 < 24 && visited[pos] != 2 && world->towerGrid[x][y+1] == -1) {
+        test = obj->type == KAMIKAZE ?
+            (world->towerGrid[x][y+1] == -1 || (world->towerGrid[x][y+1] != 255 && world->towers[world->towerGrid[x][y+1]].player != obj->player)) :
+            (world->towerGrid[x][y+1] == -1);
+        if (y + 1 < 24 && visited[pos] != 2 && test) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
@@ -303,7 +333,10 @@ u8 dijkstra(World *world, u16 id, u8 testing) {
         }
 
         pos = GRID_POS(x, y - 1);
-        if (y - 1 >= 0 && visited[pos] != 2 && world->towerGrid[x][y-1] == -1) {
+        test = obj->type == KAMIKAZE ?
+            (world->towerGrid[x][y-1] == -1 || (world->towerGrid[x][y-1] != 255 && world->towers[world->towerGrid[x][y-1]].player != obj->player)) :
+            (world->towerGrid[x][y-1] == -1);
+        if (y - 1 >= 0 && visited[pos] != 2 && test) {
             if (cost[pos] == -1 || cost[pos] > next_pos.value + 1) {
                 bin_heap_elem_t el = {pos, next_pos.value + 1};
                 cost[pos] = next_pos.value + 1;
