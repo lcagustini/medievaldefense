@@ -22,7 +22,7 @@ void drawMonster(Monster s){
     else
         dmaCopy(s.gfxData->pal, &SPRITE_PALETTE_SUB[16*s.palId], s.gfxData->palLen);
 
-    dmaCopy(s.gfxData->tiles, s.gfxPtr, 128);
+    dmaCopy(s.gfxData->tiles + 32*s.animationFrame, s.gfxPtr, 128);
 }
 
 void deleteMonster(World *w, u8 id) {
@@ -66,6 +66,8 @@ u8 newMonster(World *w, Monster s){
 
     s.drawId = getDrawId(w, s.screen);
     s.gfxPtr = oamAllocateGfx(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, s.size, s.color);
+    s.animationFrame = 0;
+    s.timer = 0;
 
     w->monsters[w->monsterNumber] = s;
 
@@ -96,49 +98,84 @@ u8 switchMonsterScreen(World *w, u8 obj) {
 void updateMonster(World *w, u8 i) {
     Monster *cur = &w->monsters[i];
 
-    u8 x0 = GRID_XPOS(cur->path[cur->cur_path_index]);
-    u8 y0 = GRID_YPOS(cur->path[cur->cur_path_index]);
-
-    u8 x = GRID_XPOS(cur->path[cur->cur_path_index +1]);
-    u8 y = GRID_YPOS(cur->path[cur->cur_path_index +1]);
-
-    s8 dx = x - x0;
-    s8 dy = y - y0;
-
-    if (dx) {
-        sassert(dx == -1 || dx == 1, "Invalid path");
-        cur->pos.x += mulf32(cur->speed, inttof32(dx));
-        cur->dir = dx > 0 ? RIGHT : LEFT;
+    {
+        switch (cur->type) {
+            case TANK:
+                if (cur->timer == 15) {
+                    cur->timer = 0;
+                    if (cur->animationFrame == 3) {
+                        cur->animationFrame = 0;
+                    }
+                    else {
+                        cur->animationFrame++;
+                    }
+                }
+                break;
+            case KAMIKAZE:
+                if (cur->timer == 15) {
+                    cur->timer = 0;
+                    if (cur->animationFrame == 3) {
+                        cur->animationFrame = 0;
+                    }
+                    else {
+                        cur->animationFrame++;
+                    }
+                }
+                break;
+            case SCOUT:
+                if (cur->timer == 10) {
+                    cur->timer = 0;
+                    cur->animationFrame = !cur->animationFrame;
+                }
+                break;
+        }
     }
-    if (dy) {
-        sassert(dy == -1 || dy == 1, "Invalid path");
-        cur->pos.y += mulf32(cur->speed, inttof32(dy));
-        cur->dir = dy > 0 ? DOWN : UP;
-    }
 
-    if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0 &&
-            f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12) == y && f32togrid(cur->pos.x) == x) {
-        cur->cur_path_index++;
+    {
+        u8 x0 = GRID_XPOS(cur->path[cur->cur_path_index]);
+        u8 y0 = GRID_YPOS(cur->path[cur->cur_path_index]);
 
-        if (w->monsterGrid[x0][y0] == i) w->monsterGrid[x0][y0] = -1;
-        w->monsterGrid[x][y] = i;
+        u8 x = GRID_XPOS(cur->path[cur->cur_path_index +1]);
+        u8 y = GRID_YPOS(cur->path[cur->cur_path_index +1]);
 
-        if (cur->cur_path_index >= cur->path_size -1) {
-            w->players[!cur->player].health--;
-            w->players[!cur->player].money++;
-            w->players[cur->player].money += 2;
+        s8 dx = x - x0;
+        s8 dy = y - y0;
 
-            deleteMonster(w, i);
+        if (dx) {
+            sassert(dx == -1 || dx == 1, "Invalid path");
+            cur->pos.x += mulf32(cur->speed, inttof32(dx));
+            cur->dir = dx > 0 ? RIGHT : LEFT;
         }
-        else if (dy == 1 && y == 12) {
-            switchMonsterScreen(w, i);
+        if (dy) {
+            sassert(dy == -1 || dy == 1, "Invalid path");
+            cur->pos.y += mulf32(cur->speed, inttof32(dy));
+            cur->dir = dy > 0 ? DOWN : UP;
         }
-        else if (dy == -1 && y == 11) {
-            switchMonsterScreen(w, i);
-        }
-        else if (w->needsDijkstra[i]) {
-            dijkstra(w, i, FALSE);
-            w->needsDijkstra[i] = FALSE;
+
+        if (f32toint(cur->pos.y) % 16 == 0 && f32toint(cur->pos.x) % 16 == 0 &&
+                f32togrid(cur->pos.y) + (cur->screen == MAIN_SCREEN ? 0 : 12) == y && f32togrid(cur->pos.x) == x) {
+            cur->cur_path_index++;
+
+            if (w->monsterGrid[x0][y0] == i) w->monsterGrid[x0][y0] = -1;
+            w->monsterGrid[x][y] = i;
+
+            if (cur->cur_path_index >= cur->path_size -1) {
+                w->players[!cur->player].health--;
+                w->players[!cur->player].money++;
+                w->players[cur->player].money += 2;
+
+                deleteMonster(w, i);
+            }
+            else if (dy == 1 && y == 12) {
+                switchMonsterScreen(w, i);
+            }
+            else if (dy == -1 && y == 11) {
+                switchMonsterScreen(w, i);
+            }
+            else if (w->needsDijkstra[i]) {
+                dijkstra(w, i, FALSE);
+                w->needsDijkstra[i] = FALSE;
+            }
         }
     }
 

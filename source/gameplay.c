@@ -148,9 +148,12 @@ Gamestate runGame() {
 
         drawHUD(&w, w.players[PLAYER_2].money, w.players[PLAYER_2].health);
 
-        if (ticker > 3282) {
-            for(int i = 0; i < w.towerNumber; i++){
+        if (ticker > 656) {
+            for (int i = 0; i < w.towerNumber; i++) {
                 w.towers[i].timer++;
+            }
+            for (int i = 0; i < w.monsterNumber; i++) {
+                w.monsters[i].timer++;
             }
 
             if (getRandomNumber(&w) > 252) {

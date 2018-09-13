@@ -120,6 +120,9 @@ typedef struct {
     u16 *path;
     u16 cur_path_index;
     u16 path_size;
+
+    u8 animationFrame;
+    u8 timer;
 } Monster;
 
 typedef struct {
