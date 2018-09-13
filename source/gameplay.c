@@ -146,7 +146,6 @@ Gamestate runGame() {
                 buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
             }
             if (getRandomNumber(&w) > 250) {
-#if 0
                 u8 rand = getRandomNumber(&w);
                 if (rand < 86) {
                     buyMonster(&w, PLAYER_1, TANK);
@@ -155,11 +154,8 @@ Gamestate runGame() {
                     buyMonster(&w, PLAYER_1, SCOUT);
                 }
                 else {
-#endif
                     buyMonster(&w, PLAYER_1, KAMIKAZE);
-#if 0
                 }
-#endif
             }
 
             ticker = 0;
