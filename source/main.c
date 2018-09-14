@@ -44,6 +44,9 @@ int main(void){
 
     while (1) {
         setUpScreens();
+        DC_FlushAll();
+        DC_InvalidateAll();
+        IC_InvalidateAll();
 
         switch (gamestate) {
             case TITLE_SCREEN:
