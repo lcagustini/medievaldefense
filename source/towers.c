@@ -122,7 +122,7 @@ void updateTower(World *w, u8 i) {
         if (candidate != -1) { // has a target in range
             cur->animationFrame = 1;
             if (w->monsters[candidate].screen == cur->screen) {
-                newProjectile(w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, 5 << 12, cur->screen, SpriteSize_8x8, SpriteColorFormat_16Color, &w->gfx[SHOT], 3);
+                newProjectile(w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, cur->damage, 5 << 12, cur->screen, SpriteSize_8x8, SpriteColorFormat_16Color, &w->gfx[SHOT], 3);
             }
         }
 

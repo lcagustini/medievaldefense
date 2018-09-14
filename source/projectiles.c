@@ -36,7 +36,7 @@ void deleteProjectile(World *w, u8 id) {
     }
 }
 
-u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, Screen screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
+u8 newProjectile(World *w, int x, int y, u8 obj, u8 damage, s32 speed, Screen screen, SpriteSize size, SpriteColorFormat format, gfx_t *data, u8 palId){
     sassert(w->projectileNumber < PROJECTILE_COUNT, "Too many sprites!");
 
     Projectile s = {0};
@@ -51,6 +51,7 @@ u8 newProjectile(World *w, int x, int y, u8 obj, s32 speed, Screen screen, Sprit
     s.speed = speed;
     s.gfxData = data;
     s.palId = palId;
+    s.damage = damage;
 
     s.dir.x = w->monsters[obj].pos.x - s.pos.x;
     s.dir.y = w->monsters[obj].pos.y - s.pos.y;
@@ -85,7 +86,7 @@ void updateProjectile(World *w, u8 i) {
             if (f32togrid(cur->pos.x) == f32togrid(w->monsters[j].pos.x) &&
                     f32togrid(cur->pos.y) == f32togrid(w->monsters[j].pos.y)) {
                 if (cur->player != w->monsters[j].player) {
-                    w->monsters[j].health--;
+                    w->monsters[j].health -= cur->damage;
                     deleteProjectile(w, i);
                     break;
                 }

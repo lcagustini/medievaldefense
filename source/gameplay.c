@@ -56,6 +56,8 @@ Gamestate runGame() {
         CREATE_BG_GFX(hud_bar);
 
         CREATE_OBJECT_GFX(tower);
+        CREATE_OBJECT_GFX(tower2);
+
         CREATE_OBJECT_GFX(troll);
         CREATE_OBJECT_GFX(wolf);
         CREATE_OBJECT_GFX(bomber);
@@ -65,6 +67,7 @@ Gamestate runGame() {
 
         w.gfx[GRASS] = teste;
         w.gfx[TOWER] = tower;
+        w.gfx[TOWER2] = tower2;
         w.gfx[TROLL] = troll;
         w.gfx[WOLF] = wolf;
         w.gfx[BOMBER] = bomber;

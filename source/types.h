@@ -68,6 +68,11 @@ typedef enum {
     PLAYER_2,
 } Team;
 
+typedef enum {
+    SMALL,
+    BIG,
+} TowerType;
+
 typedef struct {
     u8 drawId;
     SpriteSize size;
@@ -80,6 +85,9 @@ typedef struct {
     Vector pos;
     Screen screen;
     Team player;
+
+    TowerType type;
+    u8 damage;
     u8 range;
 
     u8 animationFrame;
@@ -90,7 +98,7 @@ typedef enum {
     TANK,
     SCOUT,
     KAMIKAZE,
-} MonsterTypes;
+} MonsterType;
 
 typedef enum {
     UP,
@@ -116,7 +124,7 @@ typedef struct {
     Direction dir;
     s32 speed;
 
-    MonsterTypes type;
+    MonsterType type;
     u8 cost;
     u8 reward;
 
@@ -146,6 +154,7 @@ typedef struct {
     Screen screen;
     Team player;
     s32 speed;
+    u8 damage;
 
     Vector dir;
 } Projectile;
@@ -177,6 +186,7 @@ typedef enum {
     GRASS,
 
     TOWER,
+    TOWER2,
     SHOT,
 
     TROLL,

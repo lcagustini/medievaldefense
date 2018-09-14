@@ -49,7 +49,7 @@ u8 newEffect(World *w, int x, int y, Screen screen, SpriteSize size, SpriteColor
     s.color = format;
     s.gfxData = data;
     s.palId = palId;
-    s.animationFrame = -1;
+    s.animationFrame = 0;
 
     w->effects[w->effectNumber] = s;
 
