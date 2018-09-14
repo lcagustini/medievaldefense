@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include "world.c"
+#include "effects.c"
 #include "projectiles.c"
 #include "towers.c"
 #include "monsters.c"

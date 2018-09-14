@@ -2,6 +2,11 @@ void updateScreens(World *w){
     oamClear(&oamMain, 0, 0);
     oamClear(&oamSub, 0, 0);
 
+    for(int i = 0; i < w->effectNumber; i++){
+        updateEffect(w, i);
+        drawEffect(w->effects[i]);
+    }
+
     for(int i = 0; i < w->monsterNumber; i++){
         updateMonster(w, i);
         drawMonster(w->monsters[i]);
@@ -56,6 +61,8 @@ Gamestate runGame() {
         CREATE_OBJECT_GFX(bomber);
         CREATE_OBJECT_GFX(shot);
 
+        CREATE_OBJECT_GFX(explosion);
+
         w.gfx[GRASS] = teste;
         w.gfx[TOWER] = tower;
         w.gfx[TROLL] = troll;
@@ -64,6 +71,7 @@ Gamestate runGame() {
         w.gfx[SHOT] = shot;
         w.gfx[HUD] = hud;
         w.gfx[HUD_BAR] = hud_bar;
+        w.gfx[EXPLOSION] = explosion;
     }
 
     {
@@ -97,6 +105,9 @@ Gamestate runGame() {
 
         oamRotateScale(&oamMain, 2, degreesToAngle(270), intToFixed(1, 8), intToFixed(1, 8));
         oamRotateScale(&oamSub, 2, degreesToAngle(270), intToFixed(1, 8), intToFixed(1, 8));
+
+        oamRotateScale(&oamMain, 3, degreesToAngle(0), 1 << 7, 1 << 7);
+        oamRotateScale(&oamSub, 3, degreesToAngle(0), 1 << 7, 1 << 7);
     }
 
     timerStart(0, ClockDivider_1024, 0, NULL);
@@ -149,11 +160,16 @@ Gamestate runGame() {
         drawHUD(&w, w.players[PLAYER_2].money, w.players[PLAYER_2].health);
 
         if (ticker > 656) {
-            for (int i = 0; i < w.towerNumber; i++) {
-                w.towers[i].timer++;
-            }
-            for (int i = 0; i < w.monsterNumber; i++) {
-                w.monsters[i].timer++;
+            {
+                for (int i = 0; i < w.towerNumber; i++) {
+                    w.towers[i].timer++;
+                }
+                for (int i = 0; i < w.monsterNumber; i++) {
+                    w.monsters[i].timer++;
+                }
+                for (int i = 0; i < w.effectNumber; i++) {
+                    w.effects[i].timer++;
+                }
             }
 
             if (getRandomNumber(&w) > 252) {

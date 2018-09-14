@@ -20,7 +20,7 @@ void drawTower(Tower s){
     else
         dmaCopy(s.gfxData->pal, &SPRITE_PALETTE_SUB[16*s.palId], s.gfxData->palLen);
 
-    dmaCopy(s.gfxData->tiles, s.gfxPtr, 128);
+    dmaCopy(s.gfxData->tiles + 32*s.animationFrame, s.gfxPtr, 128);
 }
 
 void deleteTower(World *w, u8 id) {
@@ -63,6 +63,8 @@ u8 newTower(World *w, Tower s){
 
     s.drawId = getDrawId(w, s.screen);
     s.gfxPtr = oamAllocateGfx(s.screen == MAIN_SCREEN ? &oamMain : &oamSub, s.size, s.color);
+    s.timer = 0;
+    s.animationFrame = 0;
 
     w->towers[w->towerNumber] = s;
 
@@ -81,6 +83,15 @@ void updateTower(World *w, u8 i) {
     Tower *cur = &w->towers[i];
 
     if (cur->timer == 20) {
+        {
+            if (cur->animationFrame == 2) {
+                cur->animationFrame = 0;
+            }
+            else {
+                cur->animationFrame = 2;
+            }
+        }
+
         s16 candidate = -1;
         u8 candidate_path_size = 255;
         u8 grid_x = f32togrid(cur->pos.x);
@@ -109,6 +120,7 @@ void updateTower(World *w, u8 i) {
             }
         }
         if (candidate != -1) { // has a target in range
+            cur->animationFrame = 1;
             if (w->monsters[candidate].screen == cur->screen) {
                 newProjectile(w, f32toint(cur->pos.x) + 4, f32toint(cur->pos.y) + 4, candidate, 5 << 12, cur->screen, SpriteSize_8x8, SpriteColorFormat_16Color, &w->gfx[SHOT], 3);
             }

@@ -1,0 +1,8 @@
+-m! # Exclude map from output (default).
+-pn16
+-ps0
+-gB4 # Bit depth of the output
+-gTFF00FF
+#metatile
+-Mh4 # Metatile height
+-Mw4 # Metatile width

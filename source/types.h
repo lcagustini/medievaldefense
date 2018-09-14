@@ -9,6 +9,7 @@
 #define PROJECTILE_COUNT 100
 #define MONSTER_COUNT 50
 #define TOWER_COUNT 50
+#define EFFECT_COUNT 16
 
 #define GRID_POS(x, y) (((y) << 4) + (x))
 #define GRID_XPOS(coord) ((coord) % 16)
@@ -80,6 +81,8 @@ typedef struct {
     Screen screen;
     Team player;
     u8 range;
+
+    u8 animationFrame;
     u8 timer;
 } Tower;
 
@@ -148,6 +151,23 @@ typedef struct {
 } Projectile;
 
 typedef struct {
+    u8 drawId;
+    SpriteSize size;
+    SpriteColorFormat color;
+    u8 palId;
+
+    u16* gfxPtr;
+    gfx_t *gfxData;
+
+    s16 x;
+    s16 y;
+    Screen screen;
+
+    u8 timer;
+    u8 animationFrame;
+} Effect;
+
+typedef struct {
     u8 id;
     gfx_t *data;
     u8 layer;
@@ -168,6 +188,8 @@ typedef enum {
 
     TOP_TITLE,
     BOTTOM_TITLE,
+
+    EXPLOSION,
 } Graphics;
 
 typedef struct {
@@ -181,13 +203,16 @@ typedef struct {
     Projectile projectiles[PROJECTILE_COUNT];
     u8 projectileNumber;
 
+    Effect effects[EFFECT_COUNT];
+    u8 effectNumber;
+
     //Access with enum Player
     Player players[2];
 
     u8 random[4];
 
     //Access with enum Graphics
-    gfx_t gfx[10];
+    gfx_t gfx[20];
     //Access with enum Screen
     u8 freeDrawId[2][128];
 
