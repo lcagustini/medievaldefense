@@ -206,6 +206,7 @@ void updateMonster(World *w, u8 i) {
             newEffect(w, f32toint(cur->pos.x) - 24, f32toint(cur->pos.y) - 24, cur->screen, SpriteSize_32x32, SpriteColorFormat_16Color, &w->gfx[EXPLOSION], 5);
             for (int j = 0; j < w->towerNumber; j++) {
                 if ((MAX(abs(f32togrid(w->towers[j].pos.x) - f32togrid(cur->pos.x)), abs(f32togrid(w->towers[j].pos.y) - f32togrid(cur->pos.y)))) <= 2) {
+                    w->players[cur->player].money += 2;
                     deleteTower(w, j);
                     j--;
                 }
