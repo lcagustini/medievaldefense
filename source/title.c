@@ -14,18 +14,32 @@ Gamestate runTitle() {
         newBackground(&w, 1, &w.gfx[BOTTOM_TITLE], BgType_Text8bpp, BgSize_T_256x256, 0, 1, SUB_SCREEN, true);
     }
 
+    touchPosition t;
+    u8 pressed = TRUE;
     while (1) {
         scanKeys();
         u16 pressedKeys = keysDown();
+        touchRead(&t);
 
-        if (pressedKeys & KEY_START) {
-            return GAMEPLAY;
+        if (t.px != 0 && t.py != 0) {
+            if (!pressed) {
+                if (t.px >= 37 && t.px <= 220 &&
+                        t.py >= 53 && t.py <= 84) {
+                    return GAMEPLAY;
+                }
+                if (t.px >= 37 && t.px <= 220 &&
+                        t.py >= 109 && t.py <= 140) {
+                    return WIFI;
+                }
+            }
+            pressed = TRUE;
+        }
+        else {
+            pressed = FALSE;
         }
 
         bgUpdate();
 
         swiWaitForVBlank();
-        oamUpdate(&oamSub);
-        oamUpdate(&oamMain);
     }
 }

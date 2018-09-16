@@ -236,4 +236,12 @@ typedef struct {
 typedef enum {
     TITLE_SCREEN,
     GAMEPLAY,
+    WIFI,
 } Gamestate;
+
+typedef struct {
+    u16 pressedKeys;
+    u8 tx;
+    u8 ty;
+    u16 frame;
+} Packet;

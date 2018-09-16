@@ -23,7 +23,7 @@ void updateScreens(World *w){
     }
 }
 
-Gamestate runGame() {
+Gamestate runGame(int socketfd, struct sockaddr_in sain) {
     World w = {0};
 
     {
@@ -121,29 +121,22 @@ Gamestate runGame() {
 
     u16 dt = 0;
     u16 ticker = 0;
+    u16 frame = 0;
 
-    u8 pressed = FALSE;
     while (1) {
         scanKeys();
         pressedKeys = keysDown();
         heldKeys = keysHeld();
+        touchRead(&t);
 
         ticker += dt;
 
-        if (t.px != 0 && t.py != 0) {
-            if (!pressed) {
-                u8 x = t.px >> 4;
-                u8 y = t.py >> 4;
-
-                buyTower(&w, x, y, PLAYER_2);
-            }
-            pressed = TRUE;
-        }
-        else {
-            pressed = FALSE;
-        }
-
         if (pressedKeys) {
+            if (socketfd != -1) {
+                Packet p = {.pressedKeys = pressedKeys, .tx = t.px, .ty = t.py, .frame = frame};
+                sendto(socketfd, &p, sizeof(p), 0, (struct sockaddr *) &sain, sizeof(sain));
+            }
+
             if (pressedKeys & KEY_A) {
                 buyMonster(&w, PLAYER_2, TANK);
             }
@@ -153,6 +146,12 @@ Gamestate runGame() {
             if (pressedKeys & KEY_X) {
                 buyMonster(&w, PLAYER_2, KAMIKAZE);
             }
+            if (pressedKeys & KEY_TOUCH) {
+                u8 x = t.px >> 4;
+                u8 y = t.py >> 4;
+
+                buyTower(&w, x, y, PLAYER_2);
+            }
         }
 
         if (!w.players[PLAYER_1].health || !w.players[PLAYER_2].health) {
@@ -161,6 +160,26 @@ Gamestate runGame() {
         }
 
         drawHUD(&w, w.players[PLAYER_2].money, w.players[PLAYER_2].health);
+
+        if (socketfd != -1) {
+            Packet p;
+            int len;
+
+            fd_set readfds;
+            struct timeval timeout = {0};
+
+            FD_ZERO(&readfds);
+            FD_SET(socketfd, &readfds);
+            u8 read = select(socketfd+1, &readfds, NULL, NULL, &timeout);
+
+            if (read == 1) {
+                u8 n = recvfrom(socketfd, &p, sizeof(p), 0, &sain, &len);
+
+                if (n > 0) {
+                    PRINT("%d %d %d %d\n", p.pressedKeys, p.tx, p.ty, p.frame);
+                }
+            }
+        }
 
         if (ticker > 656) {
             {
@@ -175,19 +194,21 @@ Gamestate runGame() {
                 }
             }
 
-            if (getRandomNumber(&w) > 252) {
-                buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
-            }
-            if (getRandomNumber(&w) > 250) {
-                u8 rand = getRandomNumber(&w);
-                if (rand < 86) {
-                    buyMonster(&w, PLAYER_1, TANK);
+            if (socketfd == -1 ) {
+                if (getRandomNumber(&w) > 252) {
+                    buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
                 }
-                else if (rand < 171){
-                    buyMonster(&w, PLAYER_1, SCOUT);
-                }
-                else {
-                    buyMonster(&w, PLAYER_1, KAMIKAZE);
+                if (getRandomNumber(&w) > 250) {
+                    u8 rand = getRandomNumber(&w);
+                    if (rand < 86) {
+                        buyMonster(&w, PLAYER_1, TANK);
+                    }
+                    else if (rand < 171){
+                        buyMonster(&w, PLAYER_1, SCOUT);
+                    }
+                    else {
+                        buyMonster(&w, PLAYER_1, KAMIKAZE);
+                    }
                 }
             }
 
@@ -208,8 +229,7 @@ Gamestate runGame() {
         updateScreens(&w);
 
         dt = timerElapsed(0);
-
-        touchRead(&t);
+        frame++;
 
         swiWaitForVBlank();
         oamUpdate(&oamSub);

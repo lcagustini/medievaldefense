@@ -93,7 +93,7 @@ GFXLIBS	?= libgfx.a
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lmm9 -lnds9 -lm -lgfx
+LIBS	:= -lmm9 -ldswifi9 -lnds9 -lm -lgfx
  
  
 #---------------------------------------------------------------------------------
@@ -166,7 +166,10 @@ $(BUILD):
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).nds $(TARGET).arm9
- 
+
+run: $(BUILD)
+	../DeSmuME-Reloaded/desmume/src/frontend/posix/gtk/desmume --bios-arm9 "../melonD/bios9.bin" --bios-arm7 "../melonD/bios7.bin" --firmware-path "../melonD/firmware.bin" --firmware-boot 0 medievaldefense.nds && rm -f *.pcap
+
  
 #---------------------------------------------------------------------------------
 else
@@ -210,7 +213,6 @@ $(SOUNDBANK_NAME).bin : $(AUDIOFILES)
 #---------------------------------------------------------------------------------
 	@echo $(notdir $^)
 	@mmutil -d $^ -o$(SOUNDBANK_NAME).bin -h$(SOUNDBANK_NAME).h
-
  
 -include $(DEPSDIR)/*.d
  

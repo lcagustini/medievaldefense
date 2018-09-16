@@ -1,6 +1,12 @@
 #include <nds.h>
 #include <time.h>
 
+#include <dswifi9.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <netdb.h>
+
 #include <all_gfx.h>
 #include "types.h"
 
@@ -12,6 +18,7 @@
 #include "background.c"
 #include "input.c"
 
+#include "wifi.c"
 #include "gameplay.c"
 #include "title.c"
 
@@ -41,6 +48,8 @@ int main(void){
     setUpScreens();
 
     Gamestate gamestate = TITLE_SCREEN;
+    int socketfd = -1;
+    struct sockaddr_in sain = {0};
 
     while (1) {
         setUpScreens();
@@ -55,7 +64,11 @@ int main(void){
                 break;
             case GAMEPLAY:
                 PRINT("Going to Gameplay\n");
-                gamestate = runGame();
+                gamestate = runGame(socketfd, sain);
+                break;
+            case WIFI:
+                PRINT("Going to Wifi\n");
+                gamestate = runWifi(&socketfd, &sain);
                 break;
         }
     }
