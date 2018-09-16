@@ -4,7 +4,6 @@
 #include <dswifi9.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <fcntl.h>
 #include <netdb.h>
 
 #include <all_gfx.h>
@@ -42,8 +41,6 @@ void setUpScreens(){
 
 int main(void){
     powerOn(POWER_ALL);
-
-    consoleDebugInit(DebugDevice_NOCASH);
 
     setUpScreens();
 

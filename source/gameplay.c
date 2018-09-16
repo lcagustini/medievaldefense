@@ -26,8 +26,10 @@ void updateScreens(World *w){
 Gamestate runGame(int socketfd, struct sockaddr_in sain) {
     World w = {0};
 
+    consoleDebugInit(DebugDevice_NOCASH);
+
     {
-        w.random[3] = time(NULL);
+        w.random[3] = 128;
         memset(&w.monsterGrid, -1, 2*16*24);
 
         s16 map[16][24] = {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -173,28 +175,42 @@ Gamestate runGame(int socketfd, struct sockaddr_in sain) {
             u8 read = select(socketfd+1, &readfds, NULL, NULL, &timeout);
 
             if (read == 1) {
-                u8 n = recvfrom(socketfd, &p, sizeof(p), 0, &sain, &len);
+                u8 n = recvfrom(socketfd, &p, sizeof(p), 0, (struct sockaddr *) &sain, &len);
 
                 if (n > 0) {
-                    PRINT("%d %d %d %d\n", p.pressedKeys, p.tx, p.ty, p.frame);
+                    if (p.pressedKeys & KEY_A) {
+                        buyMonster(&w, PLAYER_1, TANK);
+                    }
+                    if (p.pressedKeys & KEY_B) {
+                        buyMonster(&w, PLAYER_1, SCOUT);
+                    }
+                    if (p.pressedKeys & KEY_X) {
+                        buyMonster(&w, PLAYER_1, KAMIKAZE);
+                    }
+                    if (p.pressedKeys & KEY_TOUCH) {
+                        u8 x = 15 - (p.tx >> 4);
+                        u8 y = 11 - (p.ty >> 4);
+
+                        buyTower(&w, x, y, PLAYER_1);
+                    }
+
+                    PRINT("%d %d\n", frame, p.frame);
                 }
             }
         }
 
         if (ticker > 656) {
-            {
-                for (int i = 0; i < w.towerNumber; i++) {
-                    w.towers[i].timer++;
-                }
-                for (int i = 0; i < w.monsterNumber; i++) {
-                    w.monsters[i].timer++;
-                }
-                for (int i = 0; i < w.effectNumber; i++) {
-                    w.effects[i].timer++;
-                }
+            for (int i = 0; i < w.towerNumber; i++) {
+                w.towers[i].timer++;
+            }
+            for (int i = 0; i < w.monsterNumber; i++) {
+                w.monsters[i].timer++;
+            }
+            for (int i = 0; i < w.effectNumber; i++) {
+                w.effects[i].timer++;
             }
 
-            if (socketfd == -1 ) {
+            if (socketfd == -1) {
                 if (getRandomNumber(&w) > 252) {
                     buyTower(&w, (getRandomNumber(&w) % 16), (getRandomNumber(&w) % 10)+1, PLAYER_1);
                 }

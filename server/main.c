@@ -58,11 +58,19 @@ int main(void) {
         //print details of the client/peer and the data received
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 
-        if (p.pressedKeys == 0x2000 && !p.tx && !p.ty && !p.frame && playerCount < 2) {
-            si_players[playerCount] = si_other;
-            playerCount++;
+        if (p.pressedKeys == 0x2000 && !p.tx && !p.ty && !p.frame) {
+            if ((!playerCount) || (playerCount == 1 && si_players[0].sin_port != si_other.sin_port)) {
+                si_players[playerCount] = si_other;
+                playerCount++;
+                printf("Connected Player\n");
+            }
+            else {
+                p.tx = p.ty = 1;
+            }
 
-            printf("Connected Player\n");
+            sendto(s, &p, sizeof(p), 0, (struct sockaddr*) &si_other, slen); 
+            printf("Ackd Player\n");
+            printf("Player count: %d\n", playerCount);
         }
         else {
             printf("Data: %d %d %d %d\n", p.pressedKeys, p.tx, p.ty, p.frame);

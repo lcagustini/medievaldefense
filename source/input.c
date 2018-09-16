@@ -33,19 +33,21 @@ void buyTower(World *w, u8 x, u8 y, Team team) {
                 w->needsDijkstra[i] = TRUE;
             }
         }
-        else if (w->players[team].money >= 2 && index != -1 && index != 255 && w->towers[index].player == team) {
-            Tower o = w->towers[index];
-            o.palId = 6;
+        else if (w->players[team].money >= 2 && index != -1 && index != 255) {
+            if (w->towers[index].type == SMALL && w->towers[index].player == team) {
+                Tower o = w->towers[index];
+                o.palId = 6;
 
-            o.gfxData = &w->gfx[TOWER2];
+                o.gfxData = &w->gfx[TOWER2];
 
-            o.damage = 2;
-            o.range = 4;
+                o.damage = 1;
+                o.range = 4;
 
-            o.type = BIG;
+                o.type = BIG;
 
-            w->towers[index] = o;
-            w->players[team].money -= 2;
+                w->towers[index] = o;
+                w->players[team].money -= 2;
+            }
         }
     }
 }
@@ -60,7 +62,8 @@ void buyMonster(World *w, Team team, MonsterType type) {
 
     o.gfxData = type == TANK ? &w->gfx[TROLL] : (type == SCOUT ? &w->gfx[WOLF] : &w->gfx[BOMBER]);
 
-    o.pos.x = inttof32((getRandomNumber(w) % 16) << 4);
+    u8 randx = (getRandomNumber(w) % 16) << 4;
+    o.pos.x = inttof32(team == PLAYER_2 ? randx : (15 << 4)-randx);
     o.pos.y = inttof32(s == MAIN_SCREEN ? 0 : 176);
     o.screen = s;
     o.player = team;
