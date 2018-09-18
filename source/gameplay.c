@@ -165,7 +165,7 @@ Gamestate runGame(int socketfd, struct sockaddr_in sain) {
 
         if (socketfd != -1) {
             Packet p;
-            int len;
+            int len = sizeof(sain);
 
             fd_set readfds;
             struct timeval timeout = {0};

@@ -54,6 +54,7 @@ Gamestate runWifi(int *socketfd, struct sockaddr_in *sain) {
                 u8 read = select(*socketfd+1, &readfds, NULL, NULL, &timeout);
 
                 if (read == 1) {
+                    len = sizeof(sain);
                     n = recvfrom(*socketfd, &p, sizeof(p), 0, (struct sockaddr *) sain, &len);
 
                     if (n > 0) {
