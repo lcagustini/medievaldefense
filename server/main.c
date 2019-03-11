@@ -63,16 +63,21 @@ int main(void) {
                 si_players[playerCount] = si_other;
                 playerCount++;
                 printf("Connected Player\n");
+                printf("Player count: %d\n", playerCount);
+
+                if (playerCount == 2) {
+                    sendto(s, &p, sizeof(p), 0, (struct sockaddr*) &si_players[1], slen); 
+                    sendto(s, &p, sizeof(p), 0, (struct sockaddr*) &si_players[0], slen); 
+                    printf("Starting Match\n");
+                }
             }
             else {
                 p.tx = p.ty = 1;
+                sendto(s, &p, sizeof(p), 0, (struct sockaddr*) &si_other, slen);
+                printf("Denied Player\n");
             }
-
-            sendto(s, &p, sizeof(p), 0, (struct sockaddr*) &si_other, slen); 
-            printf("Ackd Player\n");
-            printf("Player count: %d\n", playerCount);
         }
-        else {
+        else if (playerCount == 2) {
             printf("Data: %d %d %d %d\n", p.pressedKeys, p.tx, p.ty, p.frame);
 
             if (si_players[0].sin_port == si_other.sin_port) {
@@ -82,7 +87,7 @@ int main(void) {
                 sendto(s, &p, sizeof(p), 0, (struct sockaddr*) &si_players[0], slen); 
             }
         }
-         
+
 #if 0
         //now reply the client with the same data
         if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1) {

@@ -56,6 +56,7 @@ dkms.conf
 *.swp
 
 # Build
-build/*
+bin/*
+build/
 *.arm9
 *.nds
